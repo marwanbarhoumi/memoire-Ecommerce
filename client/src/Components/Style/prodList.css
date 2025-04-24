@@ -1,0 +1,23 @@
+/* Styles pour le lien "Add Product" */
+.add-product-link {
+    display: inline-block;
+    margin: 20px auto; /* Espacement autour du lien */
+    padding: 10px 20px; /* Espacement interne */
+    background-color: #4299e1; /* Couleur de fond bleue */
+    color: white; /* Texte blanc */
+    text-decoration: none; /* Supprimer le soulignement */
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 5px; /* Bordures arrondies */
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .add-product-link:hover {
+    background-color: #3182ce; /* Couleur de fond plus foncée au survol */
+    transform: translateY(-2px); /* Effet de levée */
+  }
+  
+  .add-product-link:active {
+    transform: translateY(0); /* Réinitialiser l'effet de levée au clic */
+  }

@@ -1,0 +1,83 @@
+/* Styles pour le footer */
+.footer {
+    background-color: #2d3748; /* Fond sombre */
+    color: white;
+    padding: 2rem 1rem; /* Espacement interne */
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Conteneur principal */
+  .footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  /* Grille pour les sections */
+  .footer .grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: space-between; /* Espacement égal entre les sections */
+  }
+  
+  /* Sections */
+  .footer .section {
+    flex: 1; /* Chaque section prend une part égale de l'espace */
+    min-width: 200px; /* Largeur minimale pour éviter le chevauchement */
+  }
+  
+  .footer .section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #ffffff;
+  }
+  
+  .footer .section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .footer .section ul li {
+    margin-bottom: 0.75rem;
+  }
+  
+  .footer .section ul li a {
+    color: #a0aec0; /* Texte gris clair */
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.3s ease;
+  }
+  
+  .footer .section ul li a:hover {
+    color: white; /* Texte blanc au survol */
+  }
+  
+  /* Section Contact */
+  .footer .contact-section p {
+    color: #a0aec0; /* Texte gris clair */
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .footer .contact-section a {
+    color: #4299e1; /* Couleur d'accent */
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .footer .contact-section a:hover {
+    color: #63b3ed; /* Couleur d'accent plus claire au survol */
+  }
+  
+  /* Bas du footer */
+  .footer .bottom-footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(160, 174, 192, 0.2); /* Bordure grise avec transparence */
+    text-align: center;
+    color: #a0aec0; /* Texte gris clair */
+    font-size: 0.875rem;
+  }

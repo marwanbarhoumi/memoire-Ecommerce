@@ -1,0 +1,121 @@
+/* Styles pour la section Hero */
+.hero-section {
+    background: linear-gradient(135deg, #1e91fd, #f9f9fa); /* Dégradé vibrant */
+    padding: 6rem 1rem; /* Espacement généreux */
+    text-align: center;
+    color: white; /* Texte en blanc pour contraster */
+  }
+  
+  .hero-title {
+    font-size: 3.5rem; /* Taille de police grande */
+    font-weight: 900; /* Texte très gras */
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Ombre pour le texte */
+  }
+  
+  .hero-subtitle {
+    font-size: 1.5rem; /* Taille de police moyenne */
+    color: rgba(255, 255, 255, 0.9); /* Texte légèrement transparent */
+    margin-bottom: 3rem; /* Espacement sous le sous-titre */
+  }
+  
+  .hero-button {
+    background-color: #ff6b6b; /* Couleur vive */
+    color: white;
+    padding: 1rem 2.5rem; /* Taille du bouton */
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 50px; /* Bordure arrondie */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border: none; /* Pas de bordure */
+    cursor: pointer;
+  }
+  
+  .hero-button:hover {
+    background-color: #ff4757; /* Couleur plus foncée au survol */
+    transform: scale(1.05); /* Légère augmentation de taille */
+  }
+  
+  /* Styles pour la section Features */
+  .features-section {
+    padding: 6rem 1rem; /* Espacement généreux */
+    background-color: #ffffff; /* Fond blanc */
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 colonnes */
+    gap: 2rem; /* Espacement entre les cartes */
+    max-width: 1200px; /* Largeur maximale */
+    margin: 0 auto; /* Centrage */
+    padding: 0 1rem; /* Padding latéral */
+  }
+  
+  .feature-card {
+    background-color: #ffffff;
+    padding: 2.5rem; /* Espacement interne */
+    border-radius: 12px; /* Bordures arrondies */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Ombre douce */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    border: 1px solid #e0e7ff; /* Bordure légère */
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-10px); /* Effet de levée */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); /* Ombre plus prononcée */
+  }
+  
+  .feature-title {
+    font-size: 1.75rem; /* Taille de police */
+    font-weight: 700;
+    color: #2d3748; /* Couleur de texte */
+    margin-bottom: 1.5rem; /* Espacement sous le titre */
+  }
+  
+  .feature-text {
+    font-size: 1.1rem; /* Taille de police */
+    color: #4a5568; /* Couleur de texte */
+    line-height: 1.6; /* Hauteur de ligne pour la lisibilité */
+  }
+  
+  /* Styles pour le Footer */
+  .footer {
+    background-color: #1a202c; /* Fond sombre */
+    color: white;
+    padding: 2rem 1rem; /* Espacement interne */
+    text-align: center;
+  }
+  
+  .footer-text {
+    font-size: 1rem; /* Taille de police */
+    color: rgba(255, 255, 255, 0.8); /* Texte légèrement transparent */
+    margin: 0; /* Pas de marge */
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.5rem; /* Taille de police réduite pour mobile */
+    }
+  
+    .hero-subtitle {
+      font-size: 1.25rem; /* Taille de police réduite pour mobile */
+    }
+  
+    .features-grid {
+      grid-template-columns: 1fr; /* Une seule colonne sur mobile */
+    }
+  
+    .feature-card {
+      padding: 1.5rem; /* Espacement interne réduit pour mobile */
+    }
+  
+    .feature-title {
+      font-size: 1.5rem; /* Taille de police réduite pour mobile */
+    }
+  
+    .feature-text {
+      font-size: 1rem; /* Taille de police réduite pour mobile */
+    }
+  }

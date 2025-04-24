@@ -1,0 +1,8 @@
+export const LOADING = "LOADING";
+export const REGISTERSUCCESS = "REGISTERSUCCESS";
+export const AUTHFAILED = "AUTHFAILED";
+export const LOGINSUCCESS = "LOGINSUCCESS";
+export const CURRENTUSERAUTH = "CURRENTUSERAUTH";
+export const LOGOUT = "LOGOUT";
+
+

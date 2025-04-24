@@ -1,0 +1,107 @@
+.cart-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .cart-container h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+  }
+  
+  .cart-items {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1.5rem;
+  }
+  
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-top: 1px solid #eee;
+  }
+  
+  .item-info {
+    flex: 2;
+  }
+  
+  .item-info h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  .item-ref {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+  }
+  
+  .item-price {
+    flex: 1;
+    text-align: right;
+  }
+  
+  .item-price p {
+    margin: 0;
+    font-size: 1rem;
+  }
+  
+  .cart-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-top: 2px solid #333;
+    border-bottom: 2px solid #333;
+  }
+  
+  .cart-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+  }
+  
+  .continue-shopping {
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.8rem 1.5rem;
+    border: 1px solid #4CAF50;
+    border-radius: 4px;
+    transition: all 0.3s;
+  }
+  
+  .continue-shopping:hover {
+    background: #f0f9f0;
+  }
+  
+  .checkout-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .checkout-btn:hover {
+    background: #3d8b40;
+  }
+  
+  @media (max-width: 600px) {
+    .cart-item {
+      flex-direction: column;
+    }
+    
+    .item-price {
+      text-align: left;
+      margin-top: 0.5rem;
+    }
+  }
