@@ -9,7 +9,8 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand",
-    "test:coverage": "jest --coverage --coverageReporters=lcov"
+    "test:coverage": "jest --coverage --coverageReporters=lcov",
+    "sonar": "sonar-scanner"
   },
   "keywords": [
     "auth",
@@ -38,5 +39,13 @@
     "nodemon": "^3.0.2",
     "sonar-scanner": "^3.1.0",
     "supertest": "^7.1.0"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coverageReporters": ["lcov", "text-summary"],
+    "coverageDirectory": "coverage",
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": ["/node_modules/"],
+    "setupFilesAfterEnv": ["./jest.setup.js"]
   }
 }

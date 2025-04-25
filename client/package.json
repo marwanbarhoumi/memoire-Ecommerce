@@ -54,18 +54,32 @@
     },
     "devDependencies": {
         "@babel/core": "^7.26.10",
+        "@babel/plugin-transform-modules-commonjs": "^7.26.3",
+        "@babel/plugin-transform-runtime": "^7.26.10",
         "@babel/preset-env": "^7.26.9",
         "@babel/preset-react": "^7.26.3",
+        "@babel/runtime": "^7.27.0",
         "@reduxjs/toolkit": "^2.7.0",
         "@testing-library/jest-dom": "^6.6.3",
         "@testing-library/react": "^16.3.0",
         "@testing-library/user-event": "^14.6.1",
+        "axios-mock-adapter": "^2.1.0",
         "babel-jest": "^29.7.0",
         "identity-obj-proxy": "^3.0.0",
         "jest": "^27.5.1",
+        "jest-css-modules-transform": "^4.4.2",
         "jest-environment-jsdom": "^29.7.0",
         "react-router-dom": "^7.5.2",
         "redux-mock-store": "^1.5.5",
         "redux-thunk": "^3.1.0"
+    },
+    "jest": {
+        "transformIgnorePatterns": [
+            "/node_modules/(?!axios|@reduxjs|redux-thunk)"
+        ],
+        "moduleNameMapper": {
+            "^axios$": "<rootDir>/node_modules/axios/dist/axios.js",
+            "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+        }
     }
 }
