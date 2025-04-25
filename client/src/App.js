@@ -1,4 +1,3 @@
-import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import SignIn from "./Components/Login/SignIn";
 import SignUp from "./Components/Login/SignUp";
@@ -14,6 +13,7 @@ import EditProduct from "./Components/Products/EditProduct";
 import ProductDetails from "./Components/Products/ProductDetails";
 import PrivateRoute from "./Components/Private_Routes";
 import CartPage from './Components/Products/CartPage';
+import { Navigate, Route, Routes } from "react-router-dom";
 
 function App() {
   const dispatch = useDispatch();
