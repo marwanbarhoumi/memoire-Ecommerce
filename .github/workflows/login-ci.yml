@@ -2,13 +2,13 @@ name: Login Service CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
       - 'login/**'
       - 'tests/auth/**'
       - 'tests/utils/PasswordFunction.test.js'
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
       - 'login/**'
       - 'tests/auth/**'
