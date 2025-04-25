@@ -16,7 +16,7 @@ jobs:
       - name: Verify Dockerfile exists
         run: |
           ls -la
-          if [ ! -f "Dockerfile" ]; then
+          if [ ! -f "/backend/login/Dockerfile" ]; then
             echo "::error::Dockerfile not found!"
             exit 1
           fi

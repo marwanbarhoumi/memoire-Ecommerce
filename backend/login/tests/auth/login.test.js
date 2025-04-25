@@ -1,3 +1,5 @@
+global.TextEncoder = require('util').TextEncoder;
+
 const { loginuser } = require('../../controllers/authController');
 const { comparePwd } = require('../../utils/PasswordFunction');
 const generateToken = require('../../utils/Token');
