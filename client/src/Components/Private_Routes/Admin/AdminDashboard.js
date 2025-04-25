@@ -6,7 +6,7 @@ import { setAlert } from '../../../JS/action/alertAction';
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
-  const { users, loading, error } = useSelector(state => state.client || {});
+  const { users, loading } = useSelector(state => state.client || {});
   const safeUsers = Array.isArray(users) ? users : [];
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);

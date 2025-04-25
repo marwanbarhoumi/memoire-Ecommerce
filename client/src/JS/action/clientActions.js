@@ -1,8 +1,6 @@
 import axios from "axios";
 import {
-  USER_LIST_REQUEST,
   USER_LIST_SUCCESS,
-  USER_LIST_FAIL,
   USER_BAN_REQUEST,
   USER_BAN_SUCCESS,
   USER_BAN_FAIL,
