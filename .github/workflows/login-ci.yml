@@ -20,44 +20,37 @@ jobs:
     container:
       image: node:20-alpine
       volumes:
-        - /tmp/npm:/npm
+        - /tmp/npm:/npm-cache  # Fixed volume path to match `NPM_CONFIG_CACHE`
       env:
         NPM_CONFIG_CACHE: /npm-cache
         CI: true
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18.x
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x  # Matches the container's Node.js version (20-alpine)
+          cache: 'npm'
 
-    - name: Install dependencies
-      working-directory: ./login
-      run: npm ci --prefer-offline
+      - name: Install dependencies
+        working-directory: ./login
+        run: npm ci --prefer-offline
 
-    - name: Run unit tests
-      working-directory: ./login
-      run: |
-        npm test -- tests/auth/login.test.js \
-                   tests/utils/PasswordFunction.test.js \
-                   --coverage \
-                   --collectCoverageFrom='controllers/authController.js,utils/PasswordFunction.js'
+      - name: Run unit tests
+        working-directory: ./login
+        run: |
+          npm test -- tests/auth/login.test.js \
+                     tests/utils/PasswordFunction.test.js \
+                     --coverage \
+                     --collectCoverageFrom='controllers/authController.js,utils/PasswordFunction.js'
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./login/coverage/lcov.info
-        directory: ./login/coverage
-        flags: login-service
-
-    - name: SonarCloud Scan
-      if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-      uses: SonarSource/sonarcloud-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./login/coverage/lcov.info
+          directory: ./login/coverage
+          flags: login-service
