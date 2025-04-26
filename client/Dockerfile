@@ -1,20 +1,14 @@
-# Utiliser une image officielle Node
-FROM node:20-alpine
-
-# Définir le dossier de travail
+# Build
+FROM node:18-alpine as builder
 WORKDIR /app
-
-# Copier les fichiers de dépendances
 COPY package*.json ./
-
-# Installer les dépendances
-RUN npm install
-
-# Copier tout le code source
+RUN npm ci
 COPY . .
+RUN npm run build
 
-# Exposer le port 3000
-EXPOSE 3000
-
-# Lancer l'application React
-CMD ["npm", "start"]
+# Production
+FROM nginx:alpine
+COPY --from=builder /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

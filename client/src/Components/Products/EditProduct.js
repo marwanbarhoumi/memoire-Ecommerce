@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { updateProduct, getoneproduct as fetchProduct } from "../../JS/action/prodAction";
-import { createSelector } from 'reselect'; // Import createSelector
+import { createSelector } from 'reselect';
 import "../Style/EditProduct.css";
 
-// Create memoized selector
 const selectProductState = state => state.products || {};
 const selectProducts = createSelector(
   [selectProductState],
@@ -22,10 +21,8 @@ const EditProduct = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
-  // Use the memoized selector
-  const {  currentProduct, loading, error } = useSelector(selectProducts);
+  const { currentProduct, loading, error } = useSelector(selectProducts);
   
-  // Find product with stable reference
   const product = useSelector(state => 
     currentProduct || (state.products?.products || []).find(p => p._id === id),
     (a, b) => a?._id === b?._id
@@ -81,7 +78,48 @@ const EditProduct = () => {
 
   return (
     <div className="edit-product-container">
-      {/* ... rest of your JSX remains the same ... */}
+      <h2>Modifier le Produit</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Nom:</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="form-group">
+          <label>Prix:</label>
+          <input
+            type="number"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="form-group">
+          <label>Stock:</label>
+          <input
+            type="number"
+            name="stock"
+            value={formData.stock}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="form-group">
+          <label>Image URL:</label>
+          <input
+            type="text"
+            name="image"
+            value={formData.image}
+            onChange={handleChange}
+          />
+        </div>
+        <button type="submit" className="submit-btn">
+          Mettre à jour
+        </button>
+      </form>
     </div>
   );
 };

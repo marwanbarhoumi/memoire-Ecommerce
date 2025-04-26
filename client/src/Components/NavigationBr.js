@@ -15,27 +15,20 @@ import AdbIcon from "@mui/icons-material/Adb";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../JS/action/authActions";
 import { Link, useNavigate } from "react-router-dom";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"; // Icône de panier
 
 const pages = ["Products", "Pricing", "Blog"];
+const settings = ["Profile", "Account", "Dashboard", "Logout"];
 const settingsGuest = ["Sign in", "Sign up"];
 
 function NavigationBar() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook pour la navigation
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
   const isAuth = useSelector((state) => state.auth.isAuth);
   const currentUser = useSelector((state) => state.auth.currentUser);
-
-  // Settings dynamiques selon le rôle
-  const settings = [
-    "Profile",
-    "Account",
-    ...(currentUser?.role === "admin" ? ["Dashboard"] : []),
-    "Logout"
-  ];
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -53,30 +46,15 @@ function NavigationBar() {
     setAnchorElUser(null);
   };
 
-  const handleProductsClick = () => {
-    navigate("/products");
-    handleCloseNavMenu();
+  const handleLogoutUser = () => {
+    setAnchorElUser(null);
+    dispatch(logout());
+    navigate("/");
   };
 
-  const handleSettingClick = (setting) => {
-    handleCloseUserMenu();
-    switch(setting) {
-      case "Dashboard":
-        navigate("/admin_dashbord");
-        break;
-      case "Logout":
-        dispatch(logout());
-        navigate("/");
-        break;
-      case "Profile":
-        navigate("/profile");
-        break;
-      case "Account":
-        navigate("/account");
-        break;
-      default:
-        break;
-    }
+  // Fonction pour gérer la navigation vers la page des produits
+  const handleProductsClick = () => {
+    navigate("/products"); // Redirige vers /products
   };
 
   return (
@@ -174,11 +152,11 @@ function NavigationBar() {
             ))}
           </Box>
 
-          {/* Icône panier pour les clients */}
+          {/* Afficher le logo du panier si l'utilisateur est un client */}
           {isAuth && currentUser?.role === "client" && (
             <IconButton
               color="inherit"
-              onClick={() => navigate("/cart")}
+              onClick={() => navigate("/cart")} // Rediriger vers la page du panier
               sx={{ mr: 2 }}
             >
               <ShoppingCartIcon />
@@ -203,10 +181,7 @@ function NavigationBar() {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar 
-                    alt={currentUser?.firstname || "User"} 
-                    src={currentUser?.img || "/static/images/avatar/2.jpg"} 
-                  />
+                  <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -228,7 +203,9 @@ function NavigationBar() {
                 {settings.map((setting) => (
                   <MenuItem
                     key={setting}
-                    onClick={() => handleSettingClick(setting)}
+                    onClick={
+                      setting === "Logout" ? handleLogoutUser : handleCloseUserMenu
+                    }
                   >
                     <Typography textAlign="center">{setting}</Typography>
                   </MenuItem>

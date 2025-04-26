@@ -1,5 +1,6 @@
 import React from "react";
-import  "./Style/Footer.css";
+import "./Style/Footer.css";
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -13,7 +14,7 @@ const Footer = () => {
             <ul>
               {["Collections", "Promotions", "Carte Cadeau"].map((item) => (
                 <li key={item}>
-                  <a href="#">{item}</a>
+                  <a href={`/${item.toLowerCase().replace(' ', '-')}`}>{item}</a>
                 </li>
               ))}
             </ul>
@@ -25,7 +26,7 @@ const Footer = () => {
             <ul>
               {["À propos", "Carrières", "Presse", "Responsabilité", "Affiliés"].map((item) => (
                 <li key={item}>
-                  <a href="#">{item}</a>
+                  <a href={`/${item.toLowerCase().replace(' ', '-')}`}>{item}</a>
                 </li>
               ))}
             </ul>

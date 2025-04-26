@@ -1,6 +1,8 @@
 import axios from "axios";
 import {
+  USER_LIST_REQUEST,
   USER_LIST_SUCCESS,
+  USER_LIST_FAIL,
   USER_BAN_REQUEST,
   USER_BAN_SUCCESS,
   USER_BAN_FAIL,
@@ -11,11 +13,19 @@ import {
 import { setAlert } from "../action/alertAction";
 
 const api = axios.create({
-  baseURL: "http://localhost:7004",
+  baseURL: "http://localhost:7004", // Adaptez selon votre configuration
   timeout: 5000
 });
 
-// Intercepteur pour ajouter le token JWT
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Intercepteur pour le token (fonctionnel)
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -29,7 +39,7 @@ api.interceptors.request.use(
   }
 );
 
-// Intercepteur pour gérer les erreurs 401
+// Intercepteur pour les erreurs 401
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -43,10 +53,21 @@ api.interceptors.response.use(
 
 export const getAllUsers = () => async (dispatch) => {
   try {
-    const { data } = await api.get("/api/users/"); // Notez le / final
+    dispatch({ type: USER_LIST_REQUEST });
+
+    // Utilisez l'instance 'api' configurée au lieu de axios directement
+    const { data } = await api.get("/auth/all");
+
     dispatch({ type: USER_LIST_SUCCESS, payload: data });
   } catch (error) {
-    console.error("Erreur complète:", error.response || error);
+    dispatch({
+      type: USER_LIST_FAIL,
+      payload:
+        error.response?.data?.message ||
+        (error.response?.status === 401 ? "Session expirée" : error.message)
+    });
+
+    // Ne pas rediriger ici car l'intercepteur s'en charge
   }
 };
 
@@ -54,11 +75,13 @@ export const banUser = (userId, isBan) => async (dispatch) => {
   try {
     dispatch({ type: USER_BAN_REQUEST });
 
-    // Correction : Utilisation de la bonne route /api/users/:id/ban
-    await api.put(`/api/users/${userId}/ban`, { isBan });
+    // Utilisez l'instance 'api' et le bon endpoint
+    await api.put(`/auth/users/${userId}/ban`, { isBan });
 
     dispatch({ type: USER_BAN_SUCCESS, payload: { userId, isBan } });
-    dispatch(getAllUsers()); // Rafraîchir la liste
+
+    // Rafraîchir la liste après bannissement
+    dispatch(getAllUsers());
   } catch (error) {
     dispatch({
       type: USER_BAN_FAIL,
@@ -71,24 +94,28 @@ export const deleteUser = (userId) => async (dispatch) => {
   try {
     dispatch({ type: USER_DELETE_REQUEST });
 
-    // Correction : Utilisation de la bonne route /api/users/:id
-    const response = await api.delete(`/api/users/${userId}`);
+    // Updated endpoint to match your backend
+    const response = await api.delete(`/auth/users/${userId}`);
 
     dispatch({ type: USER_DELETE_SUCCESS, payload: userId });
-    dispatch(setAlert("Utilisateur supprimé avec succès", "success"));
+    dispatch(setAlert("User deleted successfully", "success"));
+
+    // Refresh user list
     dispatch(getAllUsers());
 
     return response.data;
   } catch (error) {
-    const errorMessage = error.response?.status === 404
-      ? "Utilisateur introuvable"
-      : error.response?.data?.message || "Erreur lors de la suppression";
-    
+    const errorMessage =
+      error.response?.data?.message ||
+      (error.response?.status === 404
+        ? "User not found"
+        : "Failed to delete user");
+
     dispatch({
       type: USER_DELETE_FAIL,
       payload: errorMessage
     });
-    
+
     dispatch(setAlert(errorMessage, "error"));
     throw error;
   }

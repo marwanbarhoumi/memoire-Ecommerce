@@ -6,8 +6,7 @@ import { setAlert } from '../../../JS/action/alertAction';
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
-  const { users, loading } = useSelector(state => state.client || {});
-  const safeUsers = Array.isArray(users) ? users : [];
+  const { users = [], loading } = useSelector(state => state.client ?? {});
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
@@ -15,10 +14,9 @@ const AdminDashboard = () => {
   useEffect(() => {
     dispatch(getAllUsers());
   }, [dispatch]);
-
   const fullState = useSelector(state => state);
   console.log('État complet Redux:', fullState);
-
+  // Fonctions de gestion
   const handleBanUser = (userId, isBan) => {
     if (window.confirm(`Voulez-vous vraiment ${isBan ? 'bannir' : 'débannir'} cet utilisateur ?`)) {
       dispatch(banUser(userId, isBan));
@@ -29,24 +27,26 @@ const AdminDashboard = () => {
     if (window.confirm('Voulez-vous vraiment supprimer cet utilisateur ?')) {
       try {
         await dispatch(deleteUser(userId));
+        // Notification de succès
         dispatch(setAlert('Utilisateur supprimé avec succès', 'success'));
       } catch (err) {
-        // Error is handled in the action
+        // L'erreur est déjà gérée dans l'action
       }
     }
   };
 
-  // Filtering and pagination
-  const filteredUsers = safeUsers.filter(user => 
+  // Filtrage et pagination
+  const filteredUsers = users?.filter(user => 
     `${user.firstname} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (user.phone && user.phone.toString().includes(searchTerm))
   );
 
+  // Pagination
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  const currentUsers = filteredUsers?.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers?.length / usersPerPage);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('fr-FR');
@@ -84,7 +84,7 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentUsers.length > 0 ? (
+                {currentUsers?.length > 0 ? (
                   currentUsers.map((user) => (
                     <tr key={user._id} className={user.isBan ? 'banned' : ''}>
                       <td>
@@ -139,6 +139,7 @@ const AdminDashboard = () => {
             </table>
           </div>
 
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className="pagination">
               <button 
