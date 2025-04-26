@@ -1,0 +1,24 @@
+name: Build and Deploy Docker Image
+
+on:
+  push:
+    branches: [ main ]  # Déclencheur : push sur la branche main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Exécute sur une machine virtuelle Ubuntu
+
+    steps:
+    # Étape 1 : Récupère le code
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Étape 2 : Build l'image Docker
+    - name: Build Docker image
+      run: |
+        docker build -t frontend-ecommerce .
+        
+    # Étape 3 : Lance le conteneur (exemple)
+    - name: Run container
+      run: |
+        docker run -d -p 3000:80 --name front-container frontend-ecommerce
