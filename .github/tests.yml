@@ -1,0 +1,27 @@
+name: Node.js CI
+
+on: [push, pull_request]  # Se déclenche sur push/PR
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # Machine virtuelle Ubuntu
+
+    steps:
+    - uses: actions/checkout@v4  # Checkout votre code
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'  # Version de Node (changez si nécessaire)
+
+    - name: Install dependencies
+      run: npm ci  # Plus stricte que 'npm install'
+
+    - name: Run tests
+      run: npm test  # Exécute vos tests Jest
+
+    - name: Upload coverage
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: coverage/  # Généré par '--coverage'
