@@ -47,6 +47,7 @@ jobs:
                      --coverage \
                      --collectCoverageFrom='controllers/authController.js,utils/PasswordFunction.js'
 
+<<<<<<< HEAD
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
@@ -54,3 +55,19 @@ jobs:
           files: ./login/coverage/lcov.info
           directory: ./login/coverage
           flags: login-service
+=======
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./login/coverage/lcov.info
+        directory: ./login/coverage
+        flags: login-service
+
+    - name: SonarCloud Scan
+      if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+>>>>>>> 251b1a4b5ec8000f0e36d07697110e81a9dbcd58
