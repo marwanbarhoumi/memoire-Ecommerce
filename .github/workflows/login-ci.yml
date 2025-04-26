@@ -1,0 +1,45 @@
+name: Login Service CI
+
+on:
+  push:
+    paths:
+      - 'backend/login/**'
+  pull_request:
+    paths:
+      - 'backend/login/**'
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      DB_URL: mongodb://localhost:27017/login_test
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      working-directory: ./backend/login
+      run: npm ci
+
+    - name: Run tests with coverage
+      working-directory: ./backend/login
+      run: npm test -- --coverage
+      # Seuil de couverture strict (ajustez selon vos besoins)
+      # Échoue si < 70% sur branches/functions/lines
+      env:
+        CI: true
+
+    - name: Build Docker image
+      working-directory: ./backend/login
+      run: docker build -t login-service .
+      # Nécessite Docker Login si push vers un registry
+
+    

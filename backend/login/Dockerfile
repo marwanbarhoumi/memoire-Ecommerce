@@ -1,9 +1,18 @@
-FROM node:18-alpine
+# Utiliser une image Node officielle
+FROM node:20-alpine
 
-WORKDIR /usr/src/app
-COPY package.json package-lock.json ./
-RUN npm ci --only=production
+# Créer le dossier app
+WORKDIR /app
+
+# Copier package.json et installer les deps
+COPY package*.json ./
+RUN npm install --only=production
+
+# Copier le reste du code
 COPY . .
 
-EXPOSE 7002
+# Exposer le port utilisé par ton service (ex: 3000)
+EXPOSE 3000
+
+# Commande pour démarrer l'app
 CMD ["node", "server.js"]
