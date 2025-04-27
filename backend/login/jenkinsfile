@@ -1,0 +1,20 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/marwanbarhoumi/memoire-Ecommerce'
+            }
+        }
+
+        stage('Build and Test backend/login') {
+            steps {
+                dir('backend/login') {
+                    sh 'npm install'
+                    sh 'npm test'
+                }
+            }
+        }
+    }
+}

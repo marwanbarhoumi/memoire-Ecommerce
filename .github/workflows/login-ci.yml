@@ -14,7 +14,7 @@ jobs:
     env:
       NODE_ENV: test
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      DB_URL: mongodb://localhost:27017/login_test
+      DB_URL: mongodb+srv://mern:mern@cluster0.ie7me.mongodb.net/mern?retryWrites=true&w=majority&appName=Cluster0
 
     steps:
     - uses: actions/checkout@v4
