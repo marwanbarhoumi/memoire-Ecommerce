@@ -1,5 +1,5 @@
 TN:
-SF:login\controllers\authController.js
+SF:login/controllers/authController.js
 FN:5,(anonymous_0)
 FN:29,(anonymous_1)
 FN:67,(anonymous_2)
@@ -62,7 +62,7 @@ BRF:6
 BRH:4
 end_of_record
 TN:
-SF:login\model\User.js
+SF:login/model/User.js
 FNF:0
 FNH:0
 DA:1,1
@@ -74,7 +74,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:login\utils\PasswordFunction.js
+SF:login/utils/PasswordFunction.js
 FN:3,(anonymous_0)
 FN:13,(anonymous_1)
 FNF:2
@@ -97,7 +97,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:login\utils\Token.js
+SF:login/utils/Token.js
 FN:3,createToken
 FNF:1
 FNH:0
