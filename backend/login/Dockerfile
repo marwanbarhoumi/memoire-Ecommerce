@@ -1,18 +1,18 @@
-# Utiliser une image Node officielle
+# Utiliser une image Node.js officielle légère
 FROM node:20-alpine
 
 # Créer le dossier app
 WORKDIR /app
 
-# Copier package.json et installer les deps
+# Copier package.json et installer les dépendances
 COPY package*.json ./
 RUN npm install --only=production
 
-# Copier le reste du code
+# Copier tout le code source
 COPY . .
 
-# Exposer le port utilisé par ton service (ex: 3000)
-EXPOSE 3000
+# Exposer le port de ton app
+EXPOSE 7002
 
-# Commande pour démarrer l'app
+# Lancer le serveur
 CMD ["node", "server.js"]

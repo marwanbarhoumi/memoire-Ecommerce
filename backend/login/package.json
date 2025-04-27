@@ -33,6 +33,9 @@
   },
   "devDependencies": {
     "@jest-mock/express": "^3.0.0",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.31.0",
     "jest": "^29.7.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb-memory-server": "^10.1.4",
@@ -42,10 +45,17 @@
   },
   "jest": {
     "collectCoverage": true,
-    "coverageReporters": ["lcov", "text-summary"],
+    "coverageReporters": [
+      "lcov",
+      "text-summary"
+    ],
     "coverageDirectory": "coverage",
     "testEnvironment": "node",
-    "testPathIgnorePatterns": ["/node_modules/"],
-    "setupFilesAfterEnv": ["./jest.setup.js"]
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "setupFilesAfterEnv": [
+      "./jest.setup.js"
+    ]
   }
 }

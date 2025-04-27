@@ -1,0 +1,13 @@
+services:
+  login-service:
+    container_name: login-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7002:7002"
+    env_file:
+      - ./config/.env
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
