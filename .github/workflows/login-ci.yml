@@ -19,11 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18.x'
-        cache: 'npm'
+    
 
     - name: Install dependencies
       working-directory: ./backend/login
@@ -32,14 +28,24 @@ jobs:
     - name: Run tests with coverage
       working-directory: ./backend/login
       run: npm test -- --coverage
-      # Seuil de couverture strict (ajustez selon vos besoins)
-      # Échoue si < 70% sur branches/functions/lines
       env:
         CI: true
 
     - name: Build Docker image
       working-directory: ./backend/login
       run: docker build -t login-service .
-      # Nécessite Docker Login si push vers un registry
 
-    
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Push Docker image to Docker Hub
+      run: |
+        docker tag login-service:latest marwen77/login-service:latest
+        docker push marwen77/login-service:latest
+
+    - name: Deploy with Docker Compose
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd /path/to/your/project && docker-compose up -d"

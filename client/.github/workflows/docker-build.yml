@@ -2,23 +2,24 @@ name: Build and Deploy Docker Image
 
 on:
   push:
-    branches: [ main ]  # Déclencheur : push sur la branche main
+    branches: [main]
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Exécute sur une machine virtuelle Ubuntu
+    runs-on: ubuntu-latest
 
     steps:
-    # Étape 1 : Récupère le code
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    # Étape 2 : Build l'image Docker
-    - name: Build Docker image
+    - name: Verify files
       run: |
-        docker build -t frontend-ecommerce .
+        ls -la  # Affiche la structure des fichiers
+        pwd     # Montre le répertoire courant
+
+    - name: Build
+  working-directory: ./client
+  run: docker build -t frontend-ecommerce .
         
-    # Étape 3 : Lance le conteneur (exemple)
     - name: Run container
       run: |
         docker run -d -p 3000:80 --name front-container frontend-ecommerce
