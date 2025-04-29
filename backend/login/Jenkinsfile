@@ -11,7 +11,8 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Cloner ton repository contenant le Dockerfile et docker-compose.yml
-                git 'https://github.com/ton-utilisateur/ton-repository.git'
+                git 'https://github.com/marwanbarhoumi/memoire-Ecommerce.git
+'
             }
         }
 
