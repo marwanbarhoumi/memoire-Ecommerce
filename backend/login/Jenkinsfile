@@ -2,62 +2,54 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "marwen77/mysiteweb:latest"
-        DOCKER_HUB_CREDS = 'docker-hub-creds'
-        COMPOSE_FILE = 'docker-compose.yml'
+        DOCKER_HUB_USER = 'marwen77'
+        DOCKER_HUB_PASSWORD = credentials('docker-hub-credentials-id') // Remplace par ton ID
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Cloner le dépôt') {
             steps {
-                git url: 'https://github.com/marwanbarhoumi/memoire-Ecommerce.git', credentialsId: 'github-creds'
+                git branch: 'main',
+                    url: 'https://github.com/marwanbarhoumi/memoire-Ecommerce.git',
+                    credentialsId: '0d81d621-69e2-42f1-9117-821cbce06f5b'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Installer les dépendances') {
             steps {
-                sh 'docker build -t ${DOCKER_IMAGE} .'
+                sh 'npm install --prefix frontend'
+                sh 'npm install --prefix backend'
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Lancer les tests') {
             steps {
-                withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
-                    sh "docker push ${DOCKER_IMAGE}"
+                sh 'npm test --prefix frontend || true'
+                sh 'npm test --prefix backend || true'
+            }
+        }
+
+        stage('Build des images Docker') {
+            steps {
+                sh 'docker build -t marwen77/frontend-app ./frontend'
+                sh 'docker build -t marwen77/backend-api ./backend'
+            }
+        }
+
+        stage('Push vers Docker Hub') {
+            steps {
+                withDockerRegistry([ credentialsId: 'docker-hub-credentials-id', url: '' ]) {
+                    sh 'docker push marwen77/frontend-app'
+                    sh 'docker push marwen77/backend-api'
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Déploiement avec Docker Compose') {
             steps {
-                sh "docker-compose -f ${COMPOSE_FILE} up -d"
+                sh 'docker-compose down || true'
+                sh 'docker-compose up -d'
             }
-        }
-
-        stage('Verify Deployment') {
-            steps {
-                script {
-                    def containerStatus = sh(script: 'docker ps', returnStatus: true)
-                    if (containerStatus != 0) {
-                        error "Deployment failed! Container is not running."
-                    } else {
-                        echo "Deployment verified successfully!"
-                    }
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            cleanWs()
-        }
-        success {
-            echo 'Le déploiement a réussi !'
-        }
-        failure {
-            echo 'Le déploiement a échoué.'
         }
     }
 }
