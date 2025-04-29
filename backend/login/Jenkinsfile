@@ -1,38 +1,29 @@
 pipeline {
     agent any
-    
+
     environment {
-        DOCKER_IMAGE = "marwen77/mysiteweb:latest"  // Remplace par ton nom d'image Docker
-        DOCKER_HUB_CREDS = 'docker-hub-creds'  // Identifiants Docker Hub stockés dans Jenkins Credentials
-        COMPOSE_FILE = 'docker-compose.yml'  // Chemin vers ton fichier docker-compose.yml
+        DOCKER_IMAGE = "marwen77/mysiteweb:latest"
+        DOCKER_HUB_CREDS = 'docker-hub-creds'
+        COMPOSE_FILE = 'docker-compose.yml'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                // Cloner ton repository contenant le Dockerfile et docker-compose.yml
-                git 'https://github.com/marwanbarhoumi/memoire-Ecommerce.git
-'
+                git url: 'https://github.com/marwanbarhoumi/memoire-Ecommerce.git', credentialsId: 'github-creds'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    // Construction de l'image Docker
-                    sh 'docker build -t ${DOCKER_IMAGE} .'
-                }
+                sh 'docker build -t ${DOCKER_IMAGE} .'
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                script {
-                    // Se connecter à Docker Hub
-                    withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
-                    }
-                    // Pousser l'image Docker vers Docker Hub
+                withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
                     sh "docker push ${DOCKER_IMAGE}"
                 }
             }
@@ -40,17 +31,13 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                script {
-                    // Déployer l'application via Docker Compose (si applicable)
-                    sh "docker-compose -f ${COMPOSE_FILE} up -d"
-                }
+                sh "docker-compose -f ${COMPOSE_FILE} up -d"
             }
         }
 
         stage('Verify Deployment') {
             steps {
                 script {
-                    // Vérification si le conteneur est en cours d'exécution
                     def containerStatus = sh(script: 'docker ps', returnStatus: true)
                     if (containerStatus != 0) {
                         error "Deployment failed! Container is not running."
@@ -64,14 +51,11 @@ pipeline {
 
     post {
         always {
-            // Nettoyage du workspace (utile pour éviter l'accumulation de données temporaires)
             cleanWs()
         }
-
         success {
             echo 'Le déploiement a réussi !'
         }
-
         failure {
             echo 'Le déploiement a échoué.'
         }
