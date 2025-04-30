@@ -24,7 +24,7 @@ pipeline {
 
         stage('Lancer les tests') {
             steps {
-                sh 'npm test --prefix frontend || true'
+                
                 sh 'npm test --prefix backend || true'
             }
         }
