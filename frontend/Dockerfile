@@ -1,14 +1,13 @@
-# Stage 1: Build
-FROM node:18-alpine AS builder
+FROM node:18
+
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --quiet
+RUN npm install
 COPY . .
+
+# ✅ Corrige le bug openssl
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
 RUN npm run build
 
-# Stage 2: Production
-FROM nginx:alpine
-COPY --from=builder /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Puis ton stage de production si tu en as un
