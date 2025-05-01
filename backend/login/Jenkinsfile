@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_HUB_USER = 'marwen77'
-        DOCKER_HUB_PASSWORD = credentials('docker-hub-credentials-id') // Remplace par ton ID
-    }
-
     stages {
         stage('Cloner le dépôt') {
             steps {
@@ -24,22 +19,20 @@ pipeline {
 
         stage('Lancer les tests') {
             steps {
-                
-                sh 'npm test --prefix backend || true'
+                sh 'npm test --prefix backend || echo "Tests échoués mais pipeline continue"'
             }
         }
 
         stage('Build des images Docker') {
             steps {
-
                 sh 'docker build -t marwen77/backend-api -f backend/login/Dockerfile backend/login'
-
             }
         }
 
         stage('Push vers Docker Hub') {
             steps {
-                withDockerRegistry([ credentialsId: 'docker-hub-credentials-id', url: '' ]) {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials-id', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                    sh 'echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USER --password-stdin'
                     sh 'docker push marwen77/backend-api'
                 }
             }
@@ -50,6 +43,15 @@ pipeline {
                 sh 'docker-compose down || true'
                 sh 'docker-compose up -d'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline terminé avec succès !'
+        }
+        failure {
+            echo 'Le pipeline a échoué.'
         }
     }
 }
