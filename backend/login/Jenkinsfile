@@ -31,7 +31,7 @@ pipeline {
 
         stage('Build des images Docker') {
             steps {
-                sh 'docker build -t marwen77/frontend-app ./frontend'
+                sh 
                 sh 'docker build -t marwen77/backend-api ./backend'
             }
         }
@@ -39,7 +39,7 @@ pipeline {
         stage('Push vers Docker Hub') {
             steps {
                 withDockerRegistry([ credentialsId: 'docker-hub-credentials-id', url: '' ]) {
-                    sh 'docker push marwen77/frontend-app'
+                    
                     sh 'docker push marwen77/backend-api'
                 }
             }
