@@ -38,10 +38,11 @@ pipeline {
             }
         }
 
-        stage('Déploiement avec Docker Compose') {
+         stage('Déploiement avec Docker Compose') {
             steps {
-                sh 'docker-compose down || true'
-                sh 'docker-compose up -d'
+                // Remplacer "docker-compose" par son chemin absolu
+                sh '/usr/local/bin/docker-compose down || true'
+                sh '/usr/local/bin/docker-compose up -d'
             }
         }
     }
