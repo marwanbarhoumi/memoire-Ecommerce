@@ -32,7 +32,8 @@ pipeline {
         stage('Build des images Docker') {
             steps {
 
-                sh 'docker build -t marwen77/backend-api ./backend'
+                sh 'docker build -t marwen77/backend-api -f backend/login/Dockerfile backend/login'
+
             }
         }
 
