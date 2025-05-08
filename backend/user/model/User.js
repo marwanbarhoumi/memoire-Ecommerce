@@ -8,7 +8,6 @@ const userSchema = new mongoose.Schema({
   password: { type: String },
   birthDate: { type: Date },
   createAt: { type: Date, default: Date.now() },
-
   isBan: { type: Boolean, default: false },
   img: { type: String },
   role: { type: String, enum: ["client", "admin", "seller"], default: "client" }

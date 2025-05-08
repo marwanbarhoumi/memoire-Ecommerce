@@ -13,8 +13,7 @@ function createServer() {
   app.use(express.json());
 
   // Serve static files
-  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-  console.log("Dossier uploads servi depuis :", path.join(__dirname, "uploads"));
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
 
   // Routes
   app.use("/api/products", productRouter);

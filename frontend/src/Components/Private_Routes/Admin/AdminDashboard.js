@@ -2,21 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getAllUsers, banUser, deleteUser } from '../../../JS/action/clientActions';
 import '../../Style/Dashboards.css';
-import { setAlert } from '../../../JS/action/alertAction'; 
+import { setAlert } from '../../../JS/action/alertAction';
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
-  const { users = [], loading } = useSelector(state => state.client ?? {});
+  const { users = [], loading, error } = useSelector(state => state.client ?? {});
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const usersPerPage = 10;
 
   useEffect(() => {
     dispatch(getAllUsers());
   }, [dispatch]);
-  const fullState = useSelector(state => state);
-  console.log('État complet Redux:', fullState);
-  // Fonctions de gestion
+
   const handleBanUser = (userId, isBan) => {
     if (window.confirm(`Voulez-vous vraiment ${isBan ? 'bannir' : 'débannir'} cet utilisateur ?`)) {
       dispatch(banUser(userId, isBan));
@@ -26,11 +26,18 @@ const AdminDashboard = () => {
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Voulez-vous vraiment supprimer cet utilisateur ?')) {
       try {
+        setIsDeleting(true);
+        setDeletingId(userId);
         await dispatch(deleteUser(userId));
-        // Notification de succès
-        dispatch(setAlert('Utilisateur supprimé avec succès', 'success'));
       } catch (err) {
-        // L'erreur est déjà gérée dans l'action
+        console.error('Erreur suppression:', err);
+        dispatch(setAlert(
+          err.response?.data?.message || 'Échec de la suppression', 
+          'error'
+        ));
+      } finally {
+        setIsDeleting(false);
+        setDeletingId(null);
       }
     }
   };
@@ -55,6 +62,12 @@ const AdminDashboard = () => {
   return (
     <div className="admin-dashboard">
       <h2>Gestion des Utilisateurs</h2>
+      
+      {error && (
+        <div className="alert alert-danger">
+          Erreur : {error}
+        </div>
+      )}
       
       <div className="search-bar">
         <input
@@ -116,14 +129,18 @@ const AdminDashboard = () => {
                         <button 
                           className={`ban-btn ${user.isBan ? 'unban' : ''}`}
                           onClick={() => handleBanUser(user._id, !user.isBan)}
+                          disabled={isDeleting}
                         >
                           {user.isBan ? 'Débannir' : 'Bannir'}
                         </button>
                         <button 
                           className="delete-btn"
                           onClick={() => handleDeleteUser(user._id)}
+                          disabled={isDeleting && deletingId === user._id}
                         >
-                          Supprimer
+                          {isDeleting && deletingId === user._id ? (
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                          ) : 'Supprimer'}
                         </button>
                       </td>
                     </tr>
@@ -144,7 +161,7 @@ const AdminDashboard = () => {
             <div className="pagination">
               <button 
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
+                disabled={currentPage === 1 || isDeleting}
               >
                 Précédent
               </button>
@@ -153,7 +170,7 @@ const AdminDashboard = () => {
               
               <button 
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || isDeleting}
               >
                 Suivant
               </button>

@@ -25,6 +25,7 @@ const SignIn = () => {
     
     const loginData = { email, password }; // ✅ Correction ici
     dispatch(login(loginData, navigate));
+    
   };
 
   return (

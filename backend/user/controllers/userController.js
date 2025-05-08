@@ -1,25 +1,6 @@
 const mongoose = require('mongoose'); // Ajout de l'import manquant
 const User = require('../model/User');
 
-export const getAllUsers = () => async (dispatch) => {
-  try {
-    dispatch({ type: 'GET_ALL_USERS_REQUEST' });
-
-    const { data } = await axios.get('/api/users');
-
-    dispatch({
-      type: 'GET_ALL_USERS_SUCCESS',
-      payload: Array.isArray(data) ? data : data.users, // safe fallback
-    });
-
-  } catch (error) {
-    dispatch({
-      type: 'GET_ALL_USERS_FAIL',
-      payload: error.response?.data?.message || error.message,
-    });
-  }
-}
-
 exports.deleteUser = async (req, res) => {
   try {
     // Validation de l'ID
@@ -45,5 +26,17 @@ exports.deleteUser = async (req, res) => {
       message: 'Erreur serveur',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
+  }
+};
+
+
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await User.find().lean();
+    if (!users) throw new Error("No users found"); // ← Testez cette ligne
+    res.json(users); // ← S'assurer qu'il y a bien une réponse
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({error: err.message});
   }
 };

@@ -7,8 +7,10 @@ import { deleteProduct } from "../../JS/action/prodAction";
 import "../Style/ProductCard.css"; // Fichier CSS pour les styles supplémentaires
 
 const ProductCard = ({ prd }) => {
+
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.currentUser);
+  
 
   const handleDelete = () => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) {

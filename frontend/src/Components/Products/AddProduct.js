@@ -7,16 +7,17 @@ const AddProductForm = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     qtes: "",
     description: "",
-    category: [],
-    size: [],
-    color: [],
+    category: "", // Single string as per backend
+    size: "", // Will be converted to array in backend
+    color: "", // Will be converted to array in backend
     disponible: true,
-    img: ""
+    image: null
   });
 
   const handleChange = (e) => {
@@ -24,34 +25,54 @@ const AddProductForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleArrayChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value.split(",").map((item) => item.trim())
-    });
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, image: e.target.files[0] });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
     try {
-      await dispatch(addProduct(formData));
-      // Réinitialiser le formulaire après soumission réussie
+      const data = new FormData();
+
+      // Required fields
+      data.append("name", formData.name);
+      data.append("price", formData.price);
+      data.append("qtes", formData.qtes);
+      data.append("category", formData.category);
+
+      // Optional fields
+      if (formData.description)
+        data.append("description", formData.description);
+      data.append("disponible", formData.disponible);
+
+      // Array fields (sent as comma-separated strings)
+      if (formData.size) data.append("size", formData.size);
+      if (formData.color) data.append("color", formData.color);
+
+      // Image handling
+      if (formData.image) {
+        data.append("image", formData.image);
+      }
+
+      await dispatch(addProduct(data));
+
+      // Reset form
       setFormData({
         name: "",
         price: "",
         qtes: "",
         description: "",
-        category: [],
-        size: [],
-        color: [],
+        category: "",
+        size: "",
+        color: "",
         disponible: true,
-        img: ""
+        image: null
       });
     } catch (err) {
-      setError("Erreur lors de l'ajout du produit");
+      setError(err.message || "Erreur lors de l'ajout du produit");
     } finally {
       setLoading(false);
     }
@@ -60,129 +81,134 @@ const AddProductForm = () => {
   return (
     <div className="add-product-container">
       <h1 className="add-product-title">Ajouter un nouveau produit</h1>
-      <form className="add-product-form" onSubmit={handleSubmit}>
+      <form
+        className="add-product-form"
+        onSubmit={handleSubmit}
+        encType="multipart/form-data"
+      >
+        {/* Name Field */}
         <div className="form-group">
-          <label>Nom du Produit</label>
+          <label>Nom du Produit*</label>
           <input
             type="text"
-            className="form-control"
             name="name"
             value={formData.name}
             onChange={handleChange}
+            className="form-control"
             required
           />
         </div>
 
+        {/* Price Field */}
         <div className="form-group">
-          <label>Prix (DT)</label>
+          <label>Prix (DT)*</label>
           <input
             type="number"
-            className="form-control"
             name="price"
             value={formData.price}
             onChange={handleChange}
+            className="form-control"
             required
             min="0"
             step="0.01"
           />
         </div>
 
+        {/* Quantity Field */}
         <div className="form-group">
-          <label>Quantité</label>
+          <label>Quantité*</label>
           <input
             type="number"
-            className="form-control"
             name="qtes"
             value={formData.qtes}
             onChange={handleChange}
+            className="form-control"
             required
             min="0"
           />
         </div>
 
+        {/* Category Field */}
+        <div className="form-group">
+          <label>Catégorie*</label>
+          <input
+            type="text"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            className="form-control"
+            required
+          />
+        </div>
+
+        {/* Description Field */}
         <div className="form-group">
           <label>Description</label>
           <textarea
-            className="form-control"
             name="description"
             value={formData.description}
             onChange={handleChange}
+            className="form-control"
           />
         </div>
 
+        {/* Size Field */}
         <div className="form-group">
-          <label>Catégories (séparées par des virgules)</label>
+          <label>Tailles (séparées par virgule)</label>
           <input
             type="text"
-            className="form-control"
-            name="category"
-            value={formData.category.join(",")}
-            onChange={handleArrayChange}
-          />
-          <p className="array-field-hint">Exemple: Homme,Chemise,Été</p>
-        </div>
-
-        <div className="form-group">
-          <label>Tailles (séparées par des virgules)</label>
-          <input
-            type="text"
-            className="form-control"
             name="size"
-            value={formData.size.join(",")}
-            onChange={handleArrayChange}
+            value={formData.size}
+            onChange={handleChange}
+            className="form-control"
+            placeholder="S,M,L,XL"
           />
-          <p className="array-field-hint">Exemple: S,M,L,XL</p>
         </div>
 
+        {/* Color Field */}
         <div className="form-group">
-          <label>Couleurs (séparées par des virgules)</label>
+          <label>Couleurs (séparées par virgule)</label>
           <input
             type="text"
-            className="form-control"
             name="color"
-            value={formData.color.join(",")}
-            onChange={handleArrayChange}
+            value={formData.color}
+            onChange={handleChange}
+            className="form-control"
+            placeholder="Rouge,Bleu,Noir"
           />
-          <p className="array-field-hint">Exemple: Rouge,Bleu,Noir</p>
         </div>
 
+        {/* Availability Field */}
         <div className="form-group">
           <label>Disponible</label>
           <select
-            className="form-control"
             name="disponible"
             value={formData.disponible}
             onChange={handleChange}
+            className="form-control"
           >
             <option value={true}>Oui</option>
             <option value={false}>Non</option>
           </select>
         </div>
 
+        {/* Image Field */}
         <div className="form-group">
-          <label>Image (URL)</label>
+          <label>Image du produit</label>
           <input
-            type="text"
-            className="form-control"
-            name="img"
+            type="file"
+            name="image"
             value={formData.img}
-            onChange={handleChange}
-            placeholder="https://example.com/image.jpg"
+            onChange={handleFileChange}
+            className="form-control"
           />
         </div>
 
         <button type="submit" className="submit-btn" disabled={loading}>
-          {loading ? (
-            <>
-              Ajout en cours...
-              <span className="loading"></span>
-            </>
-          ) : (
-            "Ajouter le Produit"
-          )}
+          {loading ? "En cours..." : "Ajouter le Produit"}
         </button>
 
-        {error && <p className="error-message">{error}</p>}
+        {error && <div className="error-message">{error}</div>}
       </form>
     </div>
   );

@@ -15,7 +15,7 @@ import AdbIcon from "@mui/icons-material/Adb";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../JS/action/authActions";
 import { Link, useNavigate } from "react-router-dom";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"; // Icône de panier
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -23,7 +23,7 @@ const settingsGuest = ["Sign in", "Sign up"];
 
 function NavigationBar() {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Hook pour la navigation
+  const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -52,9 +52,13 @@ function NavigationBar() {
     navigate("/");
   };
 
-  // Fonction pour gérer la navigation vers la page des produits
   const handleProductsClick = () => {
-    navigate("/products"); // Redirige vers /products
+    navigate("/products");
+  };
+
+  const handleAdminDashboard = () => {
+    setAnchorElUser(null);
+    navigate("/admin_dashbord");
   };
 
   return (
@@ -152,11 +156,10 @@ function NavigationBar() {
             ))}
           </Box>
 
-          {/* Afficher le logo du panier si l'utilisateur est un client */}
           {isAuth && currentUser?.role === "client" && (
             <IconButton
               color="inherit"
-              onClick={() => navigate("/cart")} // Rediriger vers la page du panier
+              onClick={() => navigate("/cart")}
               sx={{ mr: 2 }}
             >
               <ShoppingCartIcon />
@@ -204,7 +207,11 @@ function NavigationBar() {
                   <MenuItem
                     key={setting}
                     onClick={
-                      setting === "Logout" ? handleLogoutUser : handleCloseUserMenu
+                      setting === "Logout" 
+                        ? handleLogoutUser 
+                        : setting === "Dashboard" && currentUser?.role === "admin"
+                          ? handleAdminDashboard
+                          : handleCloseUserMenu
                     }
                   >
                     <Typography textAlign="center">{setting}</Typography>

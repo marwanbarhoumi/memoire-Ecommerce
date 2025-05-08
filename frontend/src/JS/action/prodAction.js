@@ -8,6 +8,7 @@ import {
   LOADING,
   UPDATE_PRODUCT_SUCCESS
 } from "../actionTypes/producttypes";
+import { setAlert } from './alertAction'; 
 import axios from "axios";
 
 /**
@@ -64,45 +65,58 @@ export const deleteProduct = (id) => async (dispatch) => {
 
 
 /**
- * @route POST /product/add
+ * @route POST /products/add
  * @description Add a new product
  * @access private (admin)
  */
-export const addProduct = (productData) => async (dispatch, getState) => {
+export const addProduct = (formData) => async (dispatch, getState) => {
   dispatch({ type: LOADING });
 
   try {
-    // Récupérer le token depuis Redux
     const { auth } = getState();
-    const token = auth?.user?.token;
+    const token = auth?.user?.token || localStorage.getItem('token');
 
-    // Si le token est introuvable dans Redux, essaie de le récupérer depuis localStorage
     if (!token) {
-      const tokenFromLocalStorage = localStorage.getItem('token');
-      if (!tokenFromLocalStorage) {
-        throw new Error("Utilisateur non authentifié");
-      }
+      dispatch(setAlert('Authentification requise', 'error'));
+      throw new Error("Token d'authentification manquant");
     }
 
-    // Configuration des headers avec le token
     const config = {
       headers: {
-        Authorization: `Bearer ${token}`,
-        // Pas de Content-Type si FormData
-      },
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
     };
 
-    // Envoyer la requête POST pour ajouter le produit avec la route /add
-    const { data } = await axios.post(`${baseURL}/add`, productData, config);
+    const { data } = await axios.post(
+      'http://localhost:7003/api/products/add',
+      formData,
+      config
+    );
 
-    // Dispatch du succès
     dispatch({ type: ADDPRODUCTSUCCESS, payload: data.product });
+    dispatch(setAlert('Produit ajouté avec succès', 'success'));
+
   } catch (error) {
-    console.error("Erreur lors de l'ajout du produit :", error.response?.data || error.message);
-    dispatch({ type: FAILD, payload: error.response?.data || error.message });
+    console.error('Error details:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+    });
+
+    const errorMessage = error.response?.data?.msg || 
+                        error.response?.data?.message || 
+                        error.message;
+
+    dispatch({ type: FAILD, payload: errorMessage });
+    dispatch(setAlert(`Erreur: ${errorMessage}`, 'error'));
+
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      setTimeout(() => window.location.href = '/login', 2000);
+    }
   }
 };
-
 
 /**
  * @route PATCH /products/:id

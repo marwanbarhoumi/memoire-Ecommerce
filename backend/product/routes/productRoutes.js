@@ -27,8 +27,6 @@ router.post(
   "/add",
   isAuth(),
   isAdmin,
-  addProduct,
-  //validator,
   upload("products").single("image"),
   addProduct
 );

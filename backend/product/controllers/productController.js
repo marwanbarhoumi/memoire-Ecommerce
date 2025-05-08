@@ -6,7 +6,7 @@ module.exports.addProduct = async (req, res) => {
   try {
     const { name, price, description, qtes, category, size, color } = req.body;
 
-    console.log("Fichier reçu:", req.file); // Debugging
+    console.log("Fichier reçu:", req.file);
     console.log("Données reçues:", req.body);
 
     // Validation des champs requis
@@ -16,12 +16,7 @@ module.exports.addProduct = async (req, res) => {
       });
     }
 
-    // Gestion de l'image
-    let imgUrl = "default-image.jpg"; // Image par défaut
-    if (req.file) {
-      const url = `${req.protocol}://${req.get("host")}/uploads/products/`;
-      imgUrl = `${url}${req.file.filename}`;
-    }
+    
 
     // Vérification de l'existence du produit
     const existeprod = await productmodel.findOne({ name });
@@ -38,7 +33,7 @@ module.exports.addProduct = async (req, res) => {
       category,
       size: size ? size.split(",") : [], // Si size est une string séparée par des virgules
       color: color ? color.split(",") : [], // Si color est une string séparée par des virgules
-      img: imgUrl,
+      img: req.file ? req.file.filename : "default-image.jpg",
       user: req.user._id, // Nécessite un middleware d'authentification
       disponible: true
     });

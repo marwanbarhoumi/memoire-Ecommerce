@@ -1,34 +1,29 @@
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 require("dotenv").config({ path: "./config/.env" });
 const connectDB = require("./config/DB");
 const userRouter = require("./routes/userRoute");
-const authRouter = require("./routes/authRoutes");
-
-
 
 const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Doit correspondre à votre URL frontend
-  credentials: true
-}));
+  origin: 'http://localhost:3000', // Autorisez explicitement le front
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}))
 app.use(express.json());
-
 
 // Database Connection
 connectDB();
 
 // Routes
-app.use("/api/users", userRouter);
-app.use("/api/auth", authRouter);
+app.use("/api", userRouter);
 
 // Health Check Endpoint
 app.get("/api/users/health", (req, res) => {
-  res.status(200).json({ 
-    status: "OK", 
+  res.status(200).json({
+    status: "OK",
     service: "user-service",
     db: "connected",
     fileStorage: "enabled",
@@ -40,7 +35,7 @@ app.get("/api/users/health", (req, res) => {
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error("User Service Error:", err);
-  
+
   res.status(err.status || 500).json({
     success: false,
     error: err.message || "Internal Server Error",
