@@ -1,7 +1,32 @@
 pipeline {
     agent any
 
+    environment {
+        // Configuration centralisée
+        DOCKER_IMAGE = 'marwen77/backend-api'
+        DOCKERFILE_PATH = 'backend/login/Dockerfile'
+        WORKSPACE_PATH = 'backend/login'
+        
+        // Détection automatique de la commande Docker Compose
+        DOCKER_COMPOSE_CMD = sh(
+            script: 'if command -v docker-compose &>/dev/null; then echo "docker-compose"; else echo "docker compose"; fi',
+            returnStdout: true
+        ).trim()
+    }
+
     stages {
+        stage('Vérification des prérequis') {
+            steps {
+                script {
+                    // Vérification des outils essentiels
+                    sh '''
+                        docker --version || { echo "Docker non installé"; exit 1; }
+                        ${DOCKER_COMPOSE_CMD} --version || { echo "Docker Compose non disponible"; exit 1; }
+                    '''
+                }
+            }
+        }
+
         stage('Cloner le dépôt') {
             steps {
                 git branch: 'main',
@@ -12,47 +37,65 @@ pipeline {
 
         stage('Installer les dépendances') {
             steps {
-                sh 'npm install --prefix frontend'
                 sh 'npm install --prefix backend'
+                // Nettoyage optionnel
+                sh 'npm cache clean --force || true'
             }
         }
 
         stage('Lancer les tests') {
             steps {
-                sh 'npm test --prefix backend || echo "Tests échoués mais pipeline continue"'
+                sh 'npm test --prefix backend || echo "Tests échoués - Pipeline continué"'
             }
         }
 
-        stage('Build des images Docker') {
+        stage('Build de l\'image Docker') {
             steps {
-                sh 'docker build -t marwen77/backend-api -f backend/login/Dockerfile backend/login'
+                sh """
+                    docker build -t ${DOCKER_IMAGE} \
+                    -f ${DOCKERFILE_PATH} \
+                    ${WORKSPACE_PATH}
+                """
             }
         }
 
         stage('Push vers Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials-id', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                    sh 'echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USER --password-stdin'
-                    sh 'docker push marwen77/backend-api'
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-hub-credentials-id',
+                    usernameVariable: 'DOCKER_HUB_USER',
+                    passwordVariable: 'DOCKER_HUB_PASSWORD'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+                        docker push ${DOCKER_IMAGE}
+                    '''
                 }
             }
         }
 
-         stage('Déploiement avec Docker Compose') {
+        stage('Déploiement avec Docker Compose') {
             steps {
-                // Remplacer "docker-compose" par son chemin absolu
-                sh '/usr/local/bin/docker-compose down || true'
-                sh '/usr/local/bin/docker-compose up -d'
+                sh """
+                    ${DOCKER_COMPOSE_CMD} down || true
+                    ${DOCKER_COMPOSE_CMD} up -d --build
+                """
             }
         }
     }
 
     post {
+        always {
+            // Nettoyage des ressources Docker
+            sh 'docker system prune -f --volumes || true'
+            // Archivage des logs
+            archiveArtifacts artifacts: '**/logs/*.log', allowEmptyArchive: true
+        }
         success {
-            echo 'Pipeline terminé avec succès !'
+            slackSend color: 'good', message: "Pipeline SUCCÈS - ${env.JOB_NAME} (#${env.BUILD_NUMBER})"
         }
         failure {
-            echo 'Le pipeline a échoué.'
+            slackSend color: 'danger', message: "Pipeline ÉCHEC - ${env.JOB_NAME} (#${env.BUILD_NUMBER})"
         }
     }
 }
