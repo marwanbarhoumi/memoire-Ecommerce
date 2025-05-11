@@ -198,7 +198,6 @@ const AddProductForm = () => {
           <input
             type="file"
             name="image"
-            value={formData.img}
             onChange={handleFileChange}
             className="form-control"
           />

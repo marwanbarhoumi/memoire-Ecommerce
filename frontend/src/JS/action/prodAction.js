@@ -15,7 +15,7 @@ import axios from "axios";
  * URL de base pour toutes les requêtes de produits
  * @type {string}
  */
-const baseURL = "http://localhost:7003/api/products";
+const baseURL = "http://localhost:7000/api/products";
 
 /**
  * @route GET /product/

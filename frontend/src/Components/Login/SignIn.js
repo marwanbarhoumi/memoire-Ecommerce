@@ -23,7 +23,7 @@ const SignIn = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    const loginData = { email, password }; // ✅ Correction ici
+    const loginData = { email, password }; 
     dispatch(login(loginData, navigate));
     
   };

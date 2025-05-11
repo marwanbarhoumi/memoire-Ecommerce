@@ -14,8 +14,9 @@ const AdminDashboard = () => {
   const usersPerPage = 10;
 
   useEffect(() => {
+    console.log('Fetching users...');
     dispatch(getAllUsers());
-  }, [dispatch]);
+  }, []);
 
   const handleBanUser = (userId, isBan) => {
     if (window.confirm(`Voulez-vous vraiment ${isBan ? 'bannir' : 'débannir'} cet utilisateur ?`)) {

@@ -8,19 +8,26 @@ import {
 } from "../actionTypes/authTypes";
 
 const initialState = {
-  authloading: true,
+  authloading: false,
   error: null,
   Alert: "",
   currentUser: {},
   isAuth: false
 };
 
-export const authreducer = (state = initialState, { type, payload }) => {
+export const authReducer = (state = initialState, { type, payload }) => {
   switch (type) {
     case LOADING:
-      return { ...state, authloading: true };
+      return { ...state, authloading: true, error: null };
+
     case REGISTERSUCCESS:
-      return { ...state, Alert: payload, authloading: false };
+      return {
+        ...state,
+        Alert: payload.msg || payload,
+        authloading: false,
+        error: null
+      };
+
     case LOGINSUCCESS:
       localStorage.setItem("token", payload.token);
       return {
@@ -28,29 +35,32 @@ export const authreducer = (state = initialState, { type, payload }) => {
         Alert: payload.msg,
         currentUser: payload.user,
         authloading: false,
-        isAuth: true
+        isAuth: true,
+        error: null
       };
+
     case CURRENTUSERAUTH:
       return {
         ...state,
         currentUser: payload,
         authloading: false,
-        isAuth: true
+        isAuth: true,
+        error: null
       };
 
     case LOGOUT:
       localStorage.removeItem("token");
       return {
-        ...state,
-        loading: true,
-        error: null,
-        Alert: null,
-        currentUser: {},
-        isAuth: false
+        ...initialState,
+        authloading: false
       };
 
     case AUTHFAILED:
-      return { ...state, error: payload, authloading: false };
+      return {
+        ...state,
+        error: payload,
+        authloading: false
+      };
 
     default:
       return state;

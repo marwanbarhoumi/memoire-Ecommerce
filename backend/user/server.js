@@ -8,10 +8,13 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Autorisez explicitement le front
+  origin: 'http://localhost:3000', // Frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}))
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // Allow credentials like cookies or headers
+}));
+ 
+
 app.use(express.json());
 
 // Database Connection
