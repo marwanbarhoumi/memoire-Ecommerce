@@ -2,100 +2,59 @@ pipeline {
     agent any
 
     environment {
-        // Configuration centralisée
-        DOCKER_IMAGE = 'marwen77/backend-api'
-        DOCKERFILE_PATH = 'backend/login/Dockerfile'
-        WORKSPACE_PATH = 'backend/login'
-        
-        // Détection automatique de la commande Docker Compose
-        DOCKER_COMPOSE_CMD = sh(
-            script: 'if command -v docker-compose &>/dev/null; then echo "docker-compose"; else echo "docker compose"; fi',
-            returnStdout: true
-        ).trim()
+        DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials-id')// stocké dans Jenkins (username + password)
+        IMAGE_NAME = 'marwen77/login-service'
     }
 
     stages {
-        stage('Vérification des prérequis') {
+        stage('Checkout') {
             steps {
-                script {
-                    // Vérification des outils essentiels
-                    sh '''
-                        docker --version || { echo "Docker non installé"; exit 1; }
-                        ${DOCKER_COMPOSE_CMD} --version || { echo "Docker Compose non disponible"; exit 1; }
-                    '''
-                }
+                git branch: 'main', url: 'https://github.com/marwen77/login-service.git'
+
             }
         }
 
-        stage('Cloner le dépôt') {
+        stage('Install Dependencies') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/marwanbarhoumi/memoire-Ecommerce.git',
-                    credentialsId: '0d81d621-69e2-42f1-9117-821cbce06f5b'
+                sh 'npm install'
             }
         }
 
-        stage('Installer les dépendances') {
+        stage('Run Tests') {
             steps {
-                sh 'npm install --prefix backend'
-                // Nettoyage optionnel
-                sh 'npm cache clean --force || true'
+                sh 'npm test'
             }
         }
 
-        stage('Lancer les tests') {
+        stage('Build Docker Image') {
             steps {
-                sh 'npm test --prefix backend || echo "Tests échoués - Pipeline continué"'
+                sh "docker build -t $IMAGE_NAME ."
             }
         }
 
-        stage('Build de l\'image Docker') {
+        stage('Login to Docker Hub') {
             steps {
-                sh """
-                    docker build -t ${DOCKER_IMAGE} \
-                    -f ${DOCKERFILE_PATH} \
-                    ${WORKSPACE_PATH}
-                """
+                sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
             }
         }
 
-        stage('Push vers Docker Hub') {
+        stage('Push Image to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'docker-hub-credentials-id',
-                    usernameVariable: 'DOCKER_HUB_USER',
-                    passwordVariable: 'DOCKER_HUB_PASSWORD'
-                )]) {
-                    sh '''
-                        echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
-                        docker push ${DOCKER_IMAGE}
-                    '''
-                }
+                sh "docker push $IMAGE_NAME"
             }
         }
 
-        stage('Déploiement avec Docker Compose') {
+        stage('Deploy (Optional)') {
             steps {
-                sh """
-                    ${DOCKER_COMPOSE_CMD} down || true
-                    ${DOCKER_COMPOSE_CMD} up -d --build
-                """
+                sh 'docker-compose down || true'
+                sh 'docker-compose up -d'
             }
         }
     }
 
     post {
         always {
-            // Nettoyage des ressources Docker
-            sh 'docker system prune -f --volumes || true'
-            // Archivage des logs
-            archiveArtifacts artifacts: '**/logs/*.log', allowEmptyArchive: true
-        }
-        success {
-            slackSend color: 'good', message: "Pipeline SUCCÈS - ${env.JOB_NAME} (#${env.BUILD_NUMBER})"
-        }
-        failure {
-            slackSend color: 'danger', message: "Pipeline ÉCHEC - ${env.JOB_NAME} (#${env.BUILD_NUMBER})"
+            cleanWs()
         }
     }
 }
