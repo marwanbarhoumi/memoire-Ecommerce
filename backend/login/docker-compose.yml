@@ -1,7 +1,7 @@
 version: '3'
 services:
   login-service:
-    image: marwan77/login-service:latest
+    image: marwen77/login-service:latest
     ports:
       - "7002:7002"
     environment:
