@@ -54,13 +54,14 @@ pipeline {
     }
 
     stage('Deploy to Kubernetes') {
-      steps {
-        dir('k8s') {  // Assure-toi d'avoir les fichiers deployment.yaml et service.yaml dans ce dossier
-          sh 'kubectl apply -f deployment.yaml'
-          sh 'kubectl apply -f service.yaml'
-        }
-      }
+  steps {
+    dir('backend/login') {
+      sh 'kubectl apply -f deployment.yaml'
+      sh 'kubectl apply -f service.yaml'
     }
+  }
+}
+
   }
 
   post {
