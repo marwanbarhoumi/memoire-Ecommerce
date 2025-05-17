@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     DOCKER_IMAGE = 'marwen77/login-service:latest'
-    DOCKER_CREDENTIALS_ID = 'docker-hub-credentials-id'
+    DOCKER_CREDENTIALS_ID = 'docker-hub-credentials-id'  // Remplace par ton ID Jenkins
   }
 
   stages {
@@ -36,7 +36,6 @@ pipeline {
       steps {
         dir('backend/login') {
           script {
-            // On déclare l'image docker dans un scope global à Jenkins
             env.BUILT_IMAGE_ID = docker.build(env.DOCKER_IMAGE).id
           }
         }
@@ -54,13 +53,11 @@ pipeline {
       }
     }
 
-    stage('Deploy with Docker Compose') {
+    stage('Deploy to Kubernetes') {
       steps {
-        dir('backend/login') {
-          sh '''
-            docker-compose down || true
-            docker-compose up -d
-          '''
+        dir('k8s') {  // Assure-toi d'avoir les fichiers deployment.yaml et service.yaml dans ce dossier
+          sh 'kubectl apply -f deployment.yaml'
+          sh 'kubectl apply -f service.yaml'
         }
       }
     }
