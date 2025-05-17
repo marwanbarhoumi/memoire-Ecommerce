@@ -71,13 +71,25 @@ pipeline {
           // Copier le kubeconfig dans un fichier temporaire et définir la variable d'environnement KUBECONFIG
           sh '''
             export KUBECONFIG=$KUBECONFIG_FILE
-            kubectl apply -f k8s/deployment.yaml
+            kubectl apply -f deployment.yaml
             kubectl rollout status deployment/login-deployment
           '''
         }
       }
     }
   }
+stage('Smoke Test') {
+  steps {
+    script {
+      def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/login", returnStdout: true).trim()
+      if (response != "200") {
+        error "Le service n'a pas répondu avec 200 OK. Code: ${response}"
+      } else {
+        echo "✅ Le service est en ligne !"
+      }
+    }
+  }
+}
 
   post {
     success {
