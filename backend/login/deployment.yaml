@@ -1,19 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: login-service-deployment
+  name: login-deployment
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: login-service
+      app: login
   template:
     metadata:
       labels:
-        app: login-service
+        app: login
     spec:
       containers:
-      - name: login-service
+      - name: login-container
         image: marwen77/login-service:latest
         ports:
-        - containerPort: 7002
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-service
+spec:
+  selector:
+    app: login
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
