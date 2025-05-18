@@ -4,14 +4,14 @@ pipeline {
   environment {
     DOCKER_IMAGE = 'marwen77/login-service:latest'
     DOCKER_CREDENTIALS_ID = 'docker-hub-credentials-id'
-    KUBE_CONFIG_CREDENTIALS_ID = 'kubeconfig-credentials-id'  // Jenkins credential contenant kubeconfig
+    KUBE_CONFIG_CREDENTIALS_ID = 'kubeconfig-credentials-id' // Jenkins credential contenant kubeconfig
   }
 
   stages {
     stage('Checkout Repo') {
       steps {
-        git credentialsId: '0d81d621-69e2-42f1-9117-821cbce06f5b', 
-            url: 'https://github.com/marwanbarhoumi/memoire-Ecommerce', 
+        git credentialsId: '0d81d621-69e2-42f1-9117-821cbce06f5b',
+            url: 'https://github.com/marwanbarhoumi/memoire-Ecommerce',
             branch: 'main'
         sh 'git branch -a'
       }
@@ -66,30 +66,30 @@ pipeline {
     }
 
     stage('Deploy to Kubernetes') {
-  steps {
-    dir('backend/login/k8s') {
-      sh '''
-        kubectl apply -f deployment.yaml
-        kubectl apply -f service.yaml
-        kubectl get pods
-      '''
+      steps {
+        dir('backend/login/k8s') {
+          sh '''
+            kubectl apply -f deployment.yaml
+            kubectl apply -f service.yaml
+            kubectl get pods
+          '''
+        }
+      }
     }
-  }
-}
 
-  }
-stage('Smoke Test') {
-  steps {
-    script {
-      def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/login", returnStdout: true).trim()
-      if (response != "200") {
-        error "Le service n'a pas répondu avec 200 OK. Code: ${response}"
-      } else {
-        echo "✅ Le service est en ligne !"
+    stage('Smoke Test') {
+      steps {
+        script {
+          def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/login", returnStdout: true).trim()
+          if (response != "200") {
+            error "Le service n'a pas répondu avec 200 OK. Code: ${response}"
+          } else {
+            echo "✅ Le service est en ligne !"
+          }
+        }
       }
     }
   }
-}
 
   post {
     success {
