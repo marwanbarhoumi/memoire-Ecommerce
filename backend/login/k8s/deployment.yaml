@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-deployment
+  labels:
+    app: login
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: login
+  template:
+    metadata:
+      labels:
+        app: login
+    spec:
+      containers:
+        - name: login-container
+          image: marwen77/login-service:latest
+          ports:
+            - containerPort: 3000

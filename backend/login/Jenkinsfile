@@ -66,17 +66,17 @@ pipeline {
     }
 
     stage('Deploy to Kubernetes') {
-      steps {
-        withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG_FILE')]) {
-          // Copier le kubeconfig dans un fichier temporaire et définir la variable d'environnement KUBECONFIG
-          sh '''
-            export KUBECONFIG=$KUBECONFIG_FILE
-            kubectl apply -f deployment.yaml
-            kubectl rollout status deployment/login-deployment
-          '''
-        }
-      }
+  steps {
+    dir('backend/login/k8s') {
+      sh '''
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
+        kubectl get pods
+      '''
     }
+  }
+}
+
   }
 stage('Smoke Test') {
   steps {
