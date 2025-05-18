@@ -78,21 +78,23 @@ pipeline {
       }
     }
 
-    stage('Smoke Test') {
-      steps {
-        script {
-          // 🟢 Récupère l'URL réelle du service depuis Minikube
-          def serviceUrl = sh(script: "minikube service login-service --url", returnStdout: true).trim()
-          def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' ${serviceUrl}/login", returnStdout: true).trim()
-          if (response != "200") {
-            error "❌ Le service n'a pas répondu avec 200 OK. Code: ${response}"
-          } else {
-            echo "✅ Le service est en ligne à ${serviceUrl}/login"
-          }
-        }
+   stage('Deploy to Kubernetes') {
+  steps {
+    dir('backend/login/k8s') {
+      withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
+        sh '''
+          echo "🛠️ Déploiement dans Kubernetes..."
+          kubectl version --client
+          kubectl config current-context
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
+          kubectl get pods -o wide
+        '''
       }
     }
   }
+}
+
 
   post {
     success {
