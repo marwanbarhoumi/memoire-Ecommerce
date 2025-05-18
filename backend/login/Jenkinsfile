@@ -4,7 +4,7 @@ pipeline {
   environment {
     DOCKER_IMAGE = 'marwen77/login-service:latest'
     DOCKER_CREDENTIALS_ID = 'docker-hub-credentials-id'
-    KUBE_CONFIG_CREDENTIALS_ID = 'kubeconfig-credentials-id' // Jenkins credential contenant kubeconfig
+    KUBE_CONFIG_CREDENTIALS_ID = 'kubeconfig-credentials-id' // ID du fichier kubeconfig
   }
 
   stages {
@@ -69,32 +69,18 @@ pipeline {
         dir('backend/login/k8s') {
           withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
             sh '''
+              echo "🛠️ Déploiement dans Kubernetes..."
+              kubectl version --client
+              kubectl config current-context
               kubectl apply -f deployment.yaml
               kubectl apply -f service.yaml
-              kubectl get pods
+              kubectl get pods -o wide
             '''
           }
         }
       }
     }
-
-   stage('Deploy to Kubernetes') {
-  steps {
-    dir('backend/login/k8s') {
-      withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
-        sh '''
-          echo "🛠️ Déploiement dans Kubernetes..."
-          kubectl version --client
-          kubectl config current-context
-          kubectl apply -f deployment.yaml
-          kubectl apply -f service.yaml
-          kubectl get pods -o wide
-        '''
-      }
-    }
   }
-}
-
 
   post {
     success {
