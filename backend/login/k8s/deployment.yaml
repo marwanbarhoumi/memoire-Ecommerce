@@ -19,3 +19,5 @@ spec:
           image: marwen77/login-service:latest
           ports:
             - containerPort: 3000
+      imagePullSecrets:
+        - name: dockerhub-secret
