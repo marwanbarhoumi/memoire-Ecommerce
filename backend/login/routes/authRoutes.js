@@ -4,9 +4,9 @@ const {
   registerRules,
   validator,
   loginRules
-} = require("../midlewares/validation/bodyValidation");
-const isAuth = require("../midlewares/authorization/isAuth");
-const isAdmin = require("../midlewares/authorization/isAdmin");
+} = require("../middlewares/validation/bodyValidation");
+const isAuth = require("../middlewares/authorization/isAuth");
+const isAdmin = require("../middlewares/authorization/isAdmin");
 const router = express.Router();
 /**
  * @method POST /auth/signup

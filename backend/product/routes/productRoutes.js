@@ -7,14 +7,14 @@ const {
   deleteprod
 } = require("../controllers/productController");
 
-const filterproduct = require("../midlewares/filterproduct");
+const filterproduct = require("../middlewares/filterproduct");
 const upload = require("../utils/multer");
 const {
   validator,
   AddProductRules
-} = require("../midlewares/validation/bodyValidation");
-const isAuth = require("../midlewares/authorization/isAuth");
-const isAdmin = require("../midlewares/authorization/isAdmin");
+} = require("../middlewares/validation/bodyValidation");
+const isAuth = require("../middlewares/authorization/isAuth");
+const isAdmin = require("../middlewares/authorization/isAdmin");
 
 const router = express.Router();
 
