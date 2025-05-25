@@ -9,17 +9,17 @@ pipeline {
       }
     }
 
-    stage('User Service Pipeline') {
+    stage('User Service Pipline') {
       steps {
-        echo '▶️ Démarrage du pipeline User Service'
-        build job: 'user-service-pipeline', wait: false
+        echo '▶️ Démarrage du pipline User Service'
+        build job: 'user-service-pipline', wait: false
       }
     }
 
-    stage('Product Service Pipeline') {
+    stage('Product Service Pipline') {
       steps {
-        echo '▶️ Démarrage du pipeline Product Service'
-        build job: 'product-service-pipeline', wait: false
+        echo '▶️ Démarrage du pipeine Product Service'
+        build job: 'product-service-pipline', wait: false
       }
     }
 
