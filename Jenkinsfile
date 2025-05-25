@@ -15,8 +15,8 @@ pipeline {
         // Étape 2 : User Service
         stage('User Service') {
             steps {
-                echo '▶️ Démarrage du pipeline User Service'
-                build job: 'user-service-pipeline',
+                echo '▶️ Démarrage du pipline User Service'
+                build job: 'user-service-pipline',
                       parameters: [string(name: 'VERSION', value: env.BUILD_ID)],
                       wait: true
             }
@@ -25,8 +25,8 @@ pipeline {
         // Étape 3 : Product Service
         stage('Product Service') {
             steps {
-                echo '▶️ Démarrage du pipeline Product Service'
-                build job: 'product-service-pipeline',
+                echo '▶️ Démarrage du pipline Product Service'
+                build job: 'product-service-pipline',
                       wait: true
             }
         }
