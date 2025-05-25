@@ -16,7 +16,7 @@ exports.deleteUser = async (req, res) => {
     
     res.json({ 
       success: true,
-      message: 'Utilisateur supprimé avec succès',
+      message: 'Utilisateur supprimé avec succès',//barhoumi
       deletedUserId: user._id
     });
     
