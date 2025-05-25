@@ -4,43 +4,47 @@ pipeline {
   stages {
     stage('Login Service Pipeline') {
       steps {
-        echo '▶️ Démarrage du pipeline Login Service'
-        build job: 'login-service-pipeline', wait: false
-      }
-    }
-
-    stage('User Service pipline') {
-      steps {
-        echo '▶️ Démarrage du pipline User Service'
-        build job: 'user-service-pipline', wait: false
-      }
-    }
-
-    stage('Product Service pipline') {
-      steps {
-        echo '▶️ Démarrage du pipeine Product Service'
-        build job: 'product-service-pipline', wait: false
+        dir('backend/login') {
+          echo '▶️ Démarrage du pipeline Login Service'
+          build job: 'login-service-pipeline'
+        }
       }
     }
 
     stage('Frontend Pipeline') {
       steps {
-        echo '▶️ Démarrage du pipeline Frontend'
-        build job: 'frontend-pipeline', wait: false
+        dir('frontend') {
+          echo '▶️ Démarrage du pipeline Frontend'
+          build job: 'frontend-pipeline'
+        }
       }
     }
   }
+  stages {
+    stage('product Service pipline') {
+      steps {
+        dir('backend/product') {
+          echo '▶️ Démarrage du pipeline product Service'
+          build job: 'product-service-pipline'
+        }
+      }
+    }
+    stages {
+    stage('user Service pipeline') {
+      steps {
+        dir('backend/user') {
+          echo '▶️ Démarrage du pipeline user Service'
+          build job: 'user-service-pipeline'
+        }
+      }
+    }
 
   post {
     success {
-      echo '✅ Tous les pipelines ont été déclenchés avec succès !'
-      slackSend channel: '#deployments', 
-                message: '🚀 Tous les microservices ont été déployés avec succès'
+      echo '✅ Tous les pipelines ont été exécutés avec succès !'
     }
     failure {
-      echo '❌ Une des étapes a échoué'
-      slackSend channel: '#alerts', 
-                message: '⚠️ Échec du pipeline principal. Vérifier les sous-pipelines'
+      echo '❌ Une des étapes a échoué.'
     }
   }
 }
