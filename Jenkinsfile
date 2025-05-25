@@ -9,14 +9,14 @@ pipeline {
       }
     }
 
-    stage('User Service Pipline') {
+    stage('User Service pipline') {
       steps {
         echo '▶️ Démarrage du pipline User Service'
         build job: 'user-service-pipline', wait: false
       }
     }
 
-    stage('Product Service Pipline') {
+    stage('Product Service pipline') {
       steps {
         echo '▶️ Démarrage du pipeine Product Service'
         build job: 'product-service-pipline', wait: false
