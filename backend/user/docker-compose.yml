@@ -1,0 +1,8 @@
+version: '3'
+services:
+  login-service:
+    image: marwen77/user-service:latest
+    ports:
+      - "7002:7002"
+    environment:
+      - NODE_ENV=production
