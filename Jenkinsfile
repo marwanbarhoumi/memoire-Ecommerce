@@ -11,6 +11,24 @@ pipeline {
       }
     }
 
+    stage('User Service Pipeline') {
+      steps {
+        dir('backend/user') {
+          echo '▶️ Démarrage du pipeline User Service'
+          build job: 'user-service-pipeline'
+        }
+      }
+    }
+
+    stage('Product Service Pipeline') {
+      steps {
+        dir('backend/product') {
+          echo '▶️ Démarrage du pipeline Product Service'
+          build job: 'product-service-pipeline'
+        }
+      }
+    }
+
     stage('Frontend Pipeline') {
       steps {
         dir('frontend') {
