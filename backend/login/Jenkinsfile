@@ -65,21 +65,26 @@ pipeline {
     }
 
     stage('Deploy to Kubernetes') {
-      steps {
-        dir('backend/login/k8s') {
-          withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
-            sh '''
-              echo "🛠️ Déploiement dans Kubernetes..."
-              kubectl version --client
-              kubectl config current-context
-              kubectl apply -f deployment.yaml
-              kubectl apply -f service.yaml
-              kubectl get pods -o wide
-            '''
-          }
-        }
+  environment {
+    KUBECONFIG = credentials("${KUBE_CONFIG_CREDENTIALS_ID}")
+  }
+  steps {
+    dir('backend/login/k8s') {
+      withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
+        sh '''
+          echo "🛠️ Déploiement dans Kubernetes..."
+          kubectl version --client
+          kubectl config current-context
+          kubectl get-contexts
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
+          kubectl get pods -o wide
+        '''
       }
     }
+  }
+}
+
   }
 
   post {
