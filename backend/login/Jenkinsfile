@@ -4,8 +4,7 @@ pipeline {
   environment {
     DOCKER_IMAGE = 'marwen77/login-service:latest'
     DOCKER_CREDENTIALS_ID = 'docker-hub-credentials-id'
-    KUBE_CONFIG_CREDENTIALS_ID = 'kubeconfig-credentials-id' // ID du fichier kubeconfig
-  }
+    KUBE_CONFIG_CREDENTIALS_ID = 'kubeconfig-credentials-id' 
 
   stages {
     stage('Checkout Repo') {
@@ -64,17 +63,30 @@ pipeline {
       }
     }
 
- stage('Deploy to Kubernetes') {
+stage('Deploy to Kubernetes') {
   steps {
     dir('backend/login/k8s') {
       withCredentials([file(credentialsId: 'kubeconfig-credentials-id', variable: 'KUBECONFIG')]) {
         sh '''
           echo "🛠️ Déploiement dans Kubernetes..."
+          echo "=== Version information ==="
           kubectl version --client
+          
+          echo "=== Current context ==="
           kubectl config current-context
+          kubectl cluster-info
+          
+          echo "=== Applying manifests ==="
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
-          kubectl get pods -o wide
+          
+          echo "=== Verification ==="
+          kubectl get deployments -o wide
+          kubectl get services -o wide
+          kubectl get pods -o wide --watch
+          
+          echo "=== Pods description ==="
+          kubectl describe pods -l app=login-deployment
         '''
       }
     }
