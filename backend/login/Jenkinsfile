@@ -4,7 +4,8 @@ pipeline {
   environment {
     DOCKER_IMAGE = 'marwen77/login-service:latest'
     DOCKER_CREDENTIALS_ID = 'docker-hub-credentials-id'
-    KUBE_CONFIG_CREDENTIALS_ID = 'kubeconfig-credentials-id' 
+    KUBE_CONFIG_CREDENTIALS_ID = 'kubeconfig-credentials-id'
+  }  // <-- Cette accolade fermante manquait
 
   stages {
     stage('Checkout Repo') {
@@ -63,37 +64,35 @@ pipeline {
       }
     }
 
-stage('Deploy to Kubernetes') {
-  steps {
-    dir('backend/login/k8s') {
-      withCredentials([file(credentialsId: 'kubeconfig-credentials-id', variable: 'KUBECONFIG')]) {
-        sh '''
-          echo "🛠️ Déploiement dans Kubernetes..."
-          echo "=== Version information ==="
-          kubectl version --client
-          
-          echo "=== Current context ==="
-          kubectl config current-context
-          kubectl cluster-info
-          
-          echo "=== Applying manifests ==="
-          kubectl apply -f deployment.yaml
-          kubectl apply -f service.yaml
-          
-          echo "=== Verification ==="
-          kubectl get deployments -o wide
-          kubectl get services -o wide
-          kubectl get pods -o wide --watch
-          
-          echo "=== Pods description ==="
-          kubectl describe pods -l app=login-deployment
-        '''
+    stage('Deploy to Kubernetes') {
+      steps {
+        dir('backend/login/k8s') {
+          withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
+            sh '''
+              echo "🛠️ Déploiement dans Kubernetes..."
+              echo "=== Version information ==="
+              kubectl version --client
+              
+              echo "=== Current context ==="
+              kubectl config current-context
+              kubectl cluster-info
+              
+              echo "=== Applying manifests ==="
+              kubectl apply -f deployment.yaml
+              kubectl apply -f service.yaml
+              
+              echo "=== Verification ==="
+              kubectl get deployments -o wide
+              kubectl get services -o wide
+              kubectl get pods -o wide
+              
+              echo "=== Pods description ==="
+              kubectl describe pods -l app=login-deployment
+            '''
+          }
+        }
       }
     }
-  }
-}
-
-
   }
 
   post {
