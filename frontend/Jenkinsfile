@@ -66,14 +66,15 @@ pipeline {
     stage('Deploy to Kubernetes') {
   steps {
     dir('frontend/k8s') {
-      withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
-        sh '''
-          echo "🚀 Déploiement Frontend dans Kubernetes..."
-          kubectl --kubeconfig=$KUBECONFIG apply -f deployment.yaml
-          kubectl --kubeconfig=$KUBECONFIG apply -f service.yaml
-          kubectl --kubeconfig=$KUBECONFIG get pods -o wide
-        '''
-      }
+     withCredentials([file(credentialsId: 'minikube-kubeconfig', variable: 'KUBECONFIG')]) {
+  sh '''
+    echo "🚀 Déploiement Frontend dans Kubernetes..."
+    kubectl --kubeconfig=$KUBECONFIG apply -f deployment.yaml
+    kubectl --kubeconfig=$KUBECONFIG apply -f service.yaml
+    kubectl --kubeconfig=$KUBECONFIG get pods -o wide
+  '''
+}
+
     }
   }
 }
