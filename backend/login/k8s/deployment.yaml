@@ -18,6 +18,6 @@ spec:
         - name: login-container
           image: marwen77/login-service:latest
           ports:
-            - containerPort: 7002     # <-- changer ici
+            - containerPort: 7002
       imagePullSecrets:
         - name: dockerhub-secret
