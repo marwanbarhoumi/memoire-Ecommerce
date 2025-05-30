@@ -26,44 +26,35 @@ if (process.env.REACT_APP_SENTRY_DSN) {
 }
 
 // ======================================
-// 2. CONFIGURATION DES MÉTRIQUES
-// ======================================
-const metricsEnabled = process.env.NODE_ENV === 'production' 
-  && process.env.REACT_APP_METRICS_ENABLED === 'true';
-
-let pageLoadTime;
-if (metricsEnabled) {
-  import('prom-client').then(({ Gauge, collectDefaultMetrics }) => {
-    collectDefaultMetrics();
-    pageLoadTime = new Gauge({
-      name: 'frontend_page_load_time_seconds',
-      help: 'Temps de chargement des pages en secondes',
-      labelNames: ['page_name']
-    });
-  }).catch(() => {
-    console.warn('Prometheus client failed to load');
-  });
-}
-
-// ======================================
-// 3. FONCTION DE RAPPORT DES PERFORMANCES
+// 2. FONCTION DE RAPPORT DES PERFORMANCES
 // ======================================
 function handleWebVitals(metric) {
-  if (metricsEnabled && pageLoadTime) {
-    pageLoadTime.set(
-      { page_name: window.location.pathname }, 
-      metric.value / 1000 // Conversion ms -> secondes
-    );
+  // Envoie les métriques au backend si activé
+  const metricsEnabled = process.env.NODE_ENV === 'production'
+    && process.env.REACT_APP_METRICS_ENABLED === 'true';
+
+  if (metricsEnabled) {
+    fetch("/api/metrics", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: metric.name,
+        value: metric.value,
+        page: window.location.pathname,
+      }),
+    }).catch(() => {
+      console.warn("Échec de l'envoi des métriques");
+    });
   }
-  
-  // Envoyer également à la console en développement
+
+  // Console debug en dev
   if (process.env.NODE_ENV !== 'production') {
     console.debug('[WebVitals]', metric);
   }
 }
 
 // ======================================
-// 4. RENDU DE L'APPLICATION
+// 3. RENDU DE L'APPLICATION
 // ======================================
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -78,6 +69,6 @@ root.render(
 );
 
 // ======================================
-// 5. ACTIVATION DU MONITORING
+// 4. ACTIVATION DU MONITORING
 // ======================================
 reportWebVitals(handleWebVitals);
