@@ -5,7 +5,7 @@ pipeline {
     DOCKER_IMAGE = 'marwen77/login-service:latest'
     DOCKER_CREDENTIALS_ID = 'docker-hub-credentials-id'
     KUBE_CONFIG_CREDENTIALS_ID = 'kubeconfig-credentials-id'
-  }  // <-- Cette accolade fermante manquait
+  }
 
   stages {
     stage('Checkout Repo') {
@@ -64,24 +64,21 @@ pipeline {
       }
     }
 
-   stage('Deploy to Kubernetes') {
-  steps {
-    dir('backend/login/k8s') {
-      withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
-        sh '''
-          # Configurer le contexte explicitement
-          kubectl config use-context minikube --kubeconfig=$KUBECONFIG
-          
-          # Vos commandes existantes...
-          kubectl cluster-info
-          kubectl apply -f deployment.yaml
-          kubectl apply -f service.yaml
-        '''
+    stage('Deploy to Kubernetes') {
+      steps {
+        dir('backend/login/k8s') {
+          withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
+            sh '''
+              kubectl config use-context minikube --kubeconfig=$KUBECONFIG
+              kubectl cluster-info
+              kubectl apply -f deployment.yaml
+              kubectl apply -f service.yaml
+            '''
+          }
+        }
       }
     }
-  }
-}
-  
+  } // 👈 FIN DU BLOC `stages`
 
   post {
     success {
@@ -91,5 +88,4 @@ pipeline {
       echo '❌ Pipeline failed'
     }
   }
-  }
-  }
+}
