@@ -12,7 +12,7 @@
     "start:all": "concurrently \"npm run start:auth\" \"npm run start:product\" \"npm run start:user\" \"npm run start:gateway\""
   },
   "dependencies": {
-    "@sentry/browser": "^9.22.0",
+    "@sentry/browser": "^9.23.0",
     "@sentry/react": "^9.22.0",
     "@sentry/tracing": "^7.120.3",
     "cors": "^2.8.5",
