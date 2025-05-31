@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s         # Intervalle de récupération des métriques
+
+scrape_configs:
+  - job_name: 'myapp'          # Nom du job
+    static_configs:
+      - targets: ['localhost:3000']  # Adresse où ton app expose les métriques (/metrics)
