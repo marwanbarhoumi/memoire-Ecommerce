@@ -1,9 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-deployment
-  labels:
-    app: frontend
+  name: frontend
 spec:
   replicas: 1
   selector:
@@ -13,10 +11,13 @@ spec:
     metadata:
       labels:
         app: frontend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000" # ou le port de votre frontend
+        prometheus.io/path: "/metrics" # le chemin où prom-client expose les métriques
     spec:
       containers:
-        - name: frontend
-          image: marwen77/frontend:latest
-          ports:
-            - containerPort: 80
-          imagePullPolicy: Always
+      - name: frontend
+        image: marwen77/frontend:latest
+        ports:
+        - containerPort: 3000

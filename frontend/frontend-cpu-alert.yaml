@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: frontend-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: frontend.rules
+    rules:
+    - alert: FrontendHighCPU
+      expr: |
+        100 * (sum(rate(container_cpu_usage_seconds_total{pod=~"frontend-.*"}[1m])) / 
+        (sum(kube_pod_container_resource_limits{pod=~"frontend-.*", resource="cpu"})) > 80
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High CPU usage on {{ $labels.pod }}"
