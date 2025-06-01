@@ -9,8 +9,8 @@ spec:
     rules:
     - alert: FrontendHighCPU
       expr: |
-        100 * (sum(rate(container_cpu_usage_seconds_total{pod=~"frontend-.*"}[1m])) / 
-        (sum(kube_pod_container_resource_limits{pod=~"frontend-.*", resource="cpu"})) > 80
+        (100 * (sum(rate(container_cpu_usage_seconds_total{pod=~"frontend-.*"}[1m])) /
+        sum(kube_pod_container_resource_limits{pod=~"frontend-.*", resource="cpu"}))) > 80
       for: 5m
       labels:
         severity: warning
