@@ -1,0 +1,9 @@
+grafana:
+  smtp:
+    enabled: true
+    host: smtp.gmail.com:587
+    user: marwanbarhou77@gmail.com
+    password: barhoumi7411..
+    skipVerify: true
+    fromAddress: marwanbarhou77@gmail.com
+    fromName: Grafana

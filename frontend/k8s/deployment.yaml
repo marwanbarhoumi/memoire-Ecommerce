@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  labels:
+    app: frontend
 spec:
   replicas: 1
   selector:
@@ -13,11 +15,34 @@ spec:
         app: frontend
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "3000" # ou le port de votre frontend
-        prometheus.io/path: "/metrics" # le chemin où prom-client expose les métriques
+        prometheus.io/port: "3000"  # Port de votre application
+        prometheus.io/path: "/metrics"  # Endpoint des métriques
+        prometheus.io/scheme: "http"  # Protocole (http/https)
     spec:
       containers:
       - name: frontend
         image: marwen77/frontend:latest
         ports:
         - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
