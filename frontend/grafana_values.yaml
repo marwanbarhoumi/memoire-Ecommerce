@@ -1,0 +1,8 @@
+grafana:
+  smtp:
+    enabled: true
+    host: smtp.gmail.com:587
+    user: marwanbadrou77@gmail.com
+    password: "zidsyvxxbahlzbqe"
+    from_address: marwanbadrou77@gmail.com
+    from_name: Grafana SMTP

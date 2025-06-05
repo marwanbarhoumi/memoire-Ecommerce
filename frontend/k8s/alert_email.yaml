@@ -1,0 +1,15 @@
+apiVersion: 1
+
+contactPoints:
+  - name: grafana-default-email
+    orgId: 1
+    receivers:
+      - uid: email-receiver
+        type: email
+        settings:
+          addresses: marwanbarhou77@gmail.com
+
+notificationPolicies:
+  - receiver: grafana-default-email
+    group_by: ['alertname']
+    orgId: 1
