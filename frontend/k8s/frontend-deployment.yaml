@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "80"  # Corrigé: doit matcher containerPort
+        prometheus.io/path: "/metrics"
+        prometheus.io/scheme: "http"
+    spec:
+      containers:
+      - name: frontend
+        image: marwen77/frontend:v1.0.0  # Utilisez un tag versionné
+        ports:
+        - containerPort: 80
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "80"  # Assure que l'app écoute sur le bon port
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"  # Augmenté pour NGINX
+          limits:
+            cpu: "500m"
+            memory: "1Gi"  # Augmenté pour marge de manœuvre
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 45  # Augmenté pour NGINX
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        startupProbe:  # Ajout important
+          httpGet:
+            path: /
+            port: 80
+          failureThreshold: 30
+          periodSeconds: 10
