@@ -72,7 +72,7 @@ pipeline {
               echo "🛠️ Déploiement dans Kubernetes..."
               kubectl version --client
               kubectl config current-context
-              kubectl apply -f deployment.yaml
+              kubectl apply -f user-deployment.yaml
               kubectl apply -f service.yaml
               kubectl get pods -o wide
             '''

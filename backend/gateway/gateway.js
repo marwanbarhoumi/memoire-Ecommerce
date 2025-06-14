@@ -21,7 +21,7 @@ app.use('/api/products', createProxyMiddleware({
 }));
 
 app.use('/api/user', createProxyMiddleware({
-  target: 'http://localhost:7004',  // Microservice des produits sur le port 7004
+  target: 'http://localhost:7004',  // Microservice des user sur le port 7004
   changeOrigin: true
 }));
 
