@@ -72,7 +72,7 @@ pipeline {
           export KUBECONFIG=$KUBECONFIG_FILE
           kubectl config use-context minikube
           kubectl cluster-info
-          kubectl apply -f deployment.yaml
+          kubectl apply -f login-deployment.yaml
           kubectl apply -f service.yaml
         '''
       }
