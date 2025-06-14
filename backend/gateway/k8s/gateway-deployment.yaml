@@ -24,6 +24,8 @@ spec:
           value: "production"
         - name: LOGIN_SERVICE_URL  # Ajoutez ces variables
           value: "http://login-service:80"
+        - name: VALIDATE_EMAIL
+          value: "false"
         - name: PRODUCT_SERVICE_URL
           value: "http://product-service:80"
         - name: USER_SERVICE_URL
