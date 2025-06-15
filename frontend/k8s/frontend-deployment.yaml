@@ -2,46 +2,46 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  namespace: memoire-ecommerce  # Namespace déclaré ici, pas dans les labels
   labels:
     app: frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend
-      namespace: memoire-ecommerce 
+      app: frontend  # Uniquement le label essentiel
   template:
     metadata:
       labels:
-        app: frontend
+        app: frontend  # Doit correspondre exactement au selector
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "80"  
+        prometheus.io/port: "80"
         prometheus.io/path: "/metrics"
         prometheus.io/scheme: "http"
     spec:
       containers:
       - name: frontend
-        image: marwen77/frontend:v1.0.0  
+        image: marwen77/frontend:v1.0.0
         ports:
         - containerPort: 80
         env:
         - name: NODE_ENV
           value: "production"
         - name: PORT
-          value: "80"  
+          value: "80"
         resources:
           requests:
             cpu: "100m"
-            memory: "256Mi"  
+            memory: "256Mi"
           limits:
             cpu: "500m"
-            memory: "1Gi"  
+            memory: "1Gi"
         livenessProbe:
           httpGet:
             path: /healthz
             port: 80
-          initialDelaySeconds: 45  # Augmenté pour NGINX
+          initialDelaySeconds: 45
           failureThreshold: 3
         readinessProbe:
           httpGet:
@@ -51,7 +51,7 @@ spec:
           periodSeconds: 5
           successThreshold: 1
           failureThreshold: 3
-        startupProbe:  # Ajout important
+        startupProbe:
           httpGet:
             path: /
             port: 80
