@@ -1,6 +1,16 @@
 pipeline {
   agent any
 
+ stages {
+    stage('gateway Pipeline') {
+      steps {
+        dir('backend/login') {
+          echo '▶️ Démarrage du pipeline gateway Service'
+          build job: 'gateway-pipeline'
+        }
+      }
+    }
+
   stages {
     stage('Login Service Pipeline') {
       steps {
