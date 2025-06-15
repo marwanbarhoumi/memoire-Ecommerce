@@ -11,7 +11,7 @@ pipeline {
       }
     }
 
-  stages {
+ 
     stage('Login Service Pipeline') {
       steps {
         dir('backend/login') {
@@ -47,7 +47,7 @@ pipeline {
         }
       }
     }
-  }
+  
 
   post {
     success {

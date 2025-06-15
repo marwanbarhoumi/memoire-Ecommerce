@@ -20,7 +20,7 @@ spec:
         - containerPort: 7000
         env:
         - name: PORT
-          value: "7000"  # Important pour Node.js
+          value: "7000"  
         - name: NODE_ENV
           value: "production"
         - name: LOGIN_SERVICE_URL
