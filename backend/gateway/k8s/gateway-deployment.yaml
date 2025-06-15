@@ -5,6 +5,11 @@ metadata:
   namespace: memoire-ecommerce
 spec:
   replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
   selector:
     matchLabels:
       app: gateway
@@ -20,31 +25,41 @@ spec:
         - containerPort: 7000
         env:
         - name: PORT
-          value: "7000"  
-        - name: NODE_ENV
+          value: "7000"
+        - name: NODE_ENV 
           value: "production"
         - name: LOGIN_SERVICE_URL
           value: "http://login-service.memoire-ecommerce.svc.cluster.local:80"
         - name: PRODUCT_SERVICE_URL
-          value: "http://product-service.memoire-ecommerce.svc.cluster.local:80" 
+          value: "http://product-service.memoire-ecommerce.svc.cluster.local:80"
         - name: USER_SERVICE_URL
           value: "http://user-service.memoire-ecommerce.svc.cluster.local:80"
         resources:
           limits:
+            cpu: "1000m"  # Augmenté
+            memory: "1Gi" # Augmenté
+          requests:
             cpu: "500m"
             memory: "512Mi"
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
         livenessProbe:
           httpGet:
-            path: /  # Utilisez la racine si /health n'existe pas
+            path: /health  # Doit exister dans votre app
             port: 7000
-          initialDelaySeconds: 45  # Augmenté pour Node.js
+          initialDelaySeconds: 30  # Temps initial augmenté
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /
+            path: /ready  # Doit exister dans votre app
             port: 7000
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
           periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        startupProbe:  # Nouveau - pour les apps avec démarrage lent
+          httpGet:
+            path: /health
+            port: 7000
+          failureThreshold: 30
+          periodSeconds: 10
