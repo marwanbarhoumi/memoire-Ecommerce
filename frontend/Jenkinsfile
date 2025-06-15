@@ -63,18 +63,19 @@ pipeline {
       }
     }
 
-    stage('Deploy to Kubernetes') {
-      steps {
-        script {
-          withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
-            dir('backend/login/k8s') {
-              sh 'minikube kubectl -- apply -f .'
-              sh 'minikube kubectl -- rollout status deployment/login-deployment'
-            }
-          }
-        }
+  stage('Deploy to Kubernetes') {
+  steps {
+    script {
+      withCredentials([file(credentialsId: 'kubeconfig-credentials-id', variable: 'KUBECONFIG_FILE')]) {
+        sh '''
+          export KUBECONFIG=${KUBECONFIG_FILE}
+          kubectl config use-context minikube
+          kubectl apply -f backend/login/k8s/
+        '''
       }
     }
+  }
+}
   }
 
   post {
