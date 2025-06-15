@@ -70,6 +70,7 @@ pipeline {
       withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG_FILE')]) {
         sh '''
           export KUBECONFIG=$KUBECONFIG_FILE
+          kubectl get pods -n memoire-ecommerce
           kubectl config use-context minikube
           kubectl cluster-info
           kubectl apply -f login-deployment.yaml
