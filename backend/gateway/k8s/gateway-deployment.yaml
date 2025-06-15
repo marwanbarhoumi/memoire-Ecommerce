@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   name: gateway-deployment
   namespace: memoire-ecommerce
-  labels:
-    app: gateway
 spec:
   replicas: 1
   selector:
@@ -19,18 +17,18 @@ spec:
       - name: gateway
         image: marwen77/gateway-service:latest
         ports:
-        - containerPort: 7000  # Doit correspondre au port de votre application
+        - containerPort: 7000
         env:
+        - name: PORT
+          value: "7000"  # Important pour Node.js
         - name: NODE_ENV
           value: "production"
-        - name: LOGIN_SERVICE_URL  # Ajoutez ces variables
-          value: "http://login-service:80"
-        - name: VALIDATE_EMAIL
-          value: "false"
+        - name: LOGIN_SERVICE_URL
+          value: "http://login-service.memoire-ecommerce.svc.cluster.local:80"
         - name: PRODUCT_SERVICE_URL
-          value: "http://product-service:80"
+          value: "http://product-service.memoire-ecommerce.svc.cluster.local:80" 
         - name: USER_SERVICE_URL
-          value: "http://user-service:80"
+          value: "http://user-service.memoire-ecommerce.svc.cluster.local:80"
         resources:
           limits:
             cpu: "500m"
@@ -40,13 +38,13 @@ spec:
             memory: "128Mi"
         livenessProbe:
           httpGet:
-            path: /health
+            path: /  # Utilisez la racine si /health n'existe pas
             port: 7000
-          initialDelaySeconds: 30
+          initialDelaySeconds: 45  # Augmenté pour Node.js
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /ready
+            path: /
             port: 7000
           initialDelaySeconds: 5
           periodSeconds: 5

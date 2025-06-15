@@ -2,11 +2,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gateway-service
+  namespace: memoire-ecommerce
 spec:
-  type: NodePort  # Pour Minikube, LoadBalancer ne fonctionnera pas
-  ports:
-  - port: 80
-    targetPort: 7000  # Doit matcher containerPort
-    nodePort: 30001   # Port optionnel spécifique
+  type: NodePort
   selector:
     app: gateway
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 7000  # Correspond au containerPort
+      nodePort: 30001
