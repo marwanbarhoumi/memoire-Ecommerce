@@ -9,7 +9,6 @@ spec:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
-    type: RollingUpdate
   selector:
     matchLabels:
       app: gateway
@@ -26,8 +25,9 @@ spec:
         env:
         - name: PORT
           value: "7000"
-        - name: NODE_ENV 
+        - name: NODE_ENV
           value: "production"
+        # Configuration des URLs des services internes
         - name: LOGIN_SERVICE_URL
           value: "http://login-service.memoire-ecommerce.svc.cluster.local:80"
         - name: PRODUCT_SERVICE_URL
@@ -36,30 +36,27 @@ spec:
           value: "http://user-service.memoire-ecommerce.svc.cluster.local:80"
         resources:
           limits:
-            cpu: "1000m"  # Augmenté
-            memory: "1Gi" # Augmenté
-          requests:
             cpu: "500m"
             memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        # Probes adaptées à votre code existant
         livenessProbe:
           httpGet:
-            path: /health  # Doit exister dans votre app
+            path: /gateway-status  # Utilise votre endpoint existant
             port: 7000
-          initialDelaySeconds: 30  # Temps initial augmenté
+          initialDelaySeconds: 30
           periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /ready  # Doit exister dans votre app
+            path: /gateway-status  # Utilise le même endpoint
             port: 7000
-          initialDelaySeconds: 10
+          initialDelaySeconds: 5
           periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-        startupProbe:  # Nouveau - pour les apps avec démarrage lent
+        startupProbe:
           httpGet:
-            path: /health
+            path: /gateway-status
             port: 7000
-          failureThreshold: 30
+          failureThreshold: 30  # 30 x 10s = 5 minutes max
           periodSeconds: 10
