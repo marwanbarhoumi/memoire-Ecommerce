@@ -1,7 +1,7 @@
 pipeline {
   agent any
 
- stages {
+  stages {
     stage('gateway Pipeline') {
       steps {
         dir('backend/login') {
@@ -11,7 +11,6 @@ pipeline {
       }
     }
 
- 
     stage('Login Service Pipeline') {
       steps {
         dir('backend/login') {
@@ -47,7 +46,7 @@ pipeline {
         }
       }
     }
-  
+  } // <-- Correction : Cette accolade fermante manquait
 
   post {
     success {
