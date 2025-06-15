@@ -1,7 +1,12 @@
 import express from 'express';
+import cors from 'cors';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const app = express();
+app.use(cors({
+  origin: ['http://192.168.49.2:31520'], 
+  credentials: true
+}));
 
 // Route de test
 app.get('/gateway-status', (req, res) => {

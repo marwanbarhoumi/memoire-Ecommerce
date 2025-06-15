@@ -8,7 +8,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:80"  # React app servie par Nginx (port 80 dans le conteneur)
+      - "3000:80"  
     restart: always
     environment:
       - NODE_ENV=production
