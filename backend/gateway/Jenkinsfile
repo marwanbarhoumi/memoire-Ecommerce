@@ -59,7 +59,7 @@ pipeline {
           withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
             sh '''
               kubectl config use-context minikube --kubeconfig=$KUBECONFIG
-              kubectl apply -f deployment.yaml
+              kubectl apply -f gateway-deployment.yaml
               kubectl apply -f service.yaml
             '''
           }
