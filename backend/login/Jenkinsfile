@@ -21,7 +21,7 @@ pipeline {
     stage('Install Dependencies') {
       steps {
         dir('backend/login') {
-          sh 'npm ci'  // Utilise npm ci pour des installations plus fiables que npm install
+          sh 'npm ci'
         }
       }
     }
@@ -54,28 +54,36 @@ pipeline {
       }
     }
 
-    s   stage('Deploy to Kubernetes') {
+    stage('Deploy with Docker Compose') {
+      steps {
+        dir('backend/login') {
+          sh '''
+            docker-compose down || true
+            docker-compose up -d
+          '''
+        }
+      }
+    }
+
+    stage('Deploy to Kubernetes') {
       steps {
         dir('backend/login/k8s') {
           withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG_FILE')]) {
-            script {
-              // Solution sécurisée sans interpolation Groovy
-              sh '''
-                mkdir -p ~/.kube
-                cp "${KUBECONFIG_FILE}" ~/.kube/config
-                chmod 600 ~/.kube/config
-                
-                kubectl config use-context minikube
-                kubectl cluster-info
-                kubectl get nodes
-                
-                echo "Déploiement dans le namespace ${KUBE_NAMESPACE}"
-                kubectl apply -f login-deployment.yaml -n ${KUBE_NAMESPACE}
-                kubectl apply -f service.yaml -n ${KUBE_NAMESPACE}
-                
-                kubectl rollout status deployment/login-deployment -n ${KUBE_NAMESPACE} --timeout=2m
-              '''
-            }
+            sh '''
+              mkdir -p ~/.kube
+              cp "${KUBECONFIG_FILE}" ~/.kube/config
+              chmod 600 ~/.kube/config
+              
+              kubectl config use-context minikube
+              kubectl cluster-info
+              kubectl get nodes
+              
+              echo "Déploiement dans le namespace ${KUBE_NAMESPACE}"
+              kubectl apply -f login-deployment.yaml -n ${KUBE_NAMESPACE}
+              kubectl apply -f service.yaml -n ${KUBE_NAMESPACE}
+              
+              kubectl rollout status deployment/login-deployment -n ${KUBE_NAMESPACE} --timeout=2m
+            '''
           }
         }
       }
@@ -84,13 +92,13 @@ pipeline {
 
   post {
     always {
-      cleanWs()  // Nettoyage de l'espace de travail
+      cleanWs()
     }
     success {
-      slackSend(color: 'good', message: "✅ Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} réussi")
+      echo '✅ Pipeline completed successfully 🚀'
     }
     failure {
-      slackSend(color: 'danger', message: "❌ Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} a échoué")
+      echo '❌ Pipeline failed'
     }
   }
 }
