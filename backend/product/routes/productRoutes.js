@@ -19,6 +19,19 @@ const isAdmin = require("../middlewares/authorization/isAdmin");
 const router = express.Router();
 
 /**
+ * @route GET /product/health
+ * @description Vérifier l'état du service produit
+ * @access public
+ */
+router.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "OK",
+    service: "product-service",
+    timestamp: new Date().toISOString()
+  });
+});
+
+/**
  * @route POST /product/add
  * @descripton Ajouter un produit avec une image
  * @acess protected(authentifie+role:admin/seller)
