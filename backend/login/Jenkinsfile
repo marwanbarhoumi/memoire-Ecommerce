@@ -54,26 +54,27 @@ pipeline {
       }
     }
 
-    stage('Deploy to Kubernetes') {
+    s   stage('Deploy to Kubernetes') {
       steps {
         dir('backend/login/k8s') {
-          withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
+          withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG_FILE')]) {
             script {
-              // Vérification de la connexion Kubernetes
-              sh """
-                export KUBECONFIG=${KUBECONFIG}
+              // Solution sécurisée sans interpolation Groovy
+              sh '''
+                mkdir -p ~/.kube
+                cp "${KUBECONFIG_FILE}" ~/.kube/config
+                chmod 600 ~/.kube/config
+                
                 kubectl config use-context minikube
                 kubectl cluster-info
                 kubectl get nodes
                 
-                echo "Déploiement dans le namespace ${env.KUBE_NAMESPACE}"
-                kubectl apply -f login-deployment.yaml -n ${env.KUBE_NAMESPACE}
-                kubectl apply -f service.yaml -n ${env.KUBE_NAMESPACE}
+                echo "Déploiement dans le namespace ${KUBE_NAMESPACE}"
+                kubectl apply -f login-deployment.yaml -n ${KUBE_NAMESPACE}
+                kubectl apply -f service.yaml -n ${KUBE_NAMESPACE}
                 
-                echo "Vérification du déploiement"
-                kubectl rollout status deployment/login-deployment -n ${env.KUBE_NAMESPACE} --timeout=2m
-                kubectl get pods -n ${env.KUBE_NAMESPACE}
-              """
+                kubectl rollout status deployment/login-deployment -n ${KUBE_NAMESPACE} --timeout=2m
+              '''
             }
           }
         }
