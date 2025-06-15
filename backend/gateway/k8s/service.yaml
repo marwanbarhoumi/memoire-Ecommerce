@@ -7,6 +7,6 @@ spec:
   ports:
   - port: 80
     targetPort: 7000  # Doit matcher containerPort
-    nodePort: 30000   # Port optionnel spécifique
+    nodePort: 30001   # Port optionnel spécifique
   selector:
     app: gateway
