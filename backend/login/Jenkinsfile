@@ -66,28 +66,26 @@ pipeline {
     }
 
     stage('Deploy to Kubernetes') {
-      steps {
-        dir('backend/login/k8s') {
-          withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG_FILE')]) {
-            sh '''
-              mkdir -p ~/.kube
-              cp "${KUBECONFIG_FILE}" ~/.kube/config
-              chmod 600 ~/.kube/config
-              
-              kubectl config use-context minikube
-              kubectl cluster-info
-              kubectl get nodes
-              
-              echo "Déploiement dans le namespace ${KUBE_NAMESPACE}"
-              kubectl apply -f login-deployment.yaml -n ${KUBE_NAMESPACE}
-              kubectl apply -f service.yaml -n ${KUBE_NAMESPACE}
-              
-              kubectl rollout status deployment/login-deployment -n ${KUBE_NAMESPACE} --timeout=2m
-            '''
-          }
-        }
+  steps {
+    dir('backend/login/k8s') {
+      withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG_FILE')]) {
+        sh '''
+          mkdir -p ~/.kube
+          cp "${KUBECONFIG_FILE}" ~/.kube/config
+          chmod 600 ~/.kube/config
+          
+          # Vérification du fichier
+          head -n 5 ~/.kube/config
+          kubectl config view --raw
+          
+          kubectl config use-context minikube
+          kubectl cluster-info
+          kubectl apply -f login-deployment.yaml -n ${KUBE_NAMESPACE}
+        '''
       }
     }
+  }
+}
   }
 
   post {
