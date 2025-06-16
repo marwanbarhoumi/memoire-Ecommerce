@@ -4,72 +4,95 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const app = express();
 
-// Configuration CORS
+// Configuration CORS pour Kubernetes
+const CORS_ORIGINS = [
+  'http://frontend-service.memoire-ecommerce.svc.cluster.local',
+  'http://localhost:3000',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: ['http://192.168.49.2:31520', 'http://localhost'], 
+  origin: CORS_ORIGINS,
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 
-// Middleware pour parser le JSON
+// Middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Route de santé
-app.get('/gateway-status', (req, res) => {
-  res.json({ 
-    status: 'OK',
-    services: {
-      auth: 'http://login-service:80',
-      products: 'http://product-service:80',
-      users: 'http://user-service:80'
-    }
-  });
-});
-
-// Configuration des proxies
-const proxyOptions = {
-  logLevel: 'debug',
-  changeOrigin: true,
-  onProxyReq: (proxyReq, req) => {
-    console.log(`Proxying ${req.method} request to: ${proxyReq.path}`);
+// Configuration des services
+const SERVICES = {
+  AUTH: {
+    url: process.env.LOGIN_SERVICE_URL || 'http://login-service.memoire-ecommerce.svc.cluster.local:80',
+    path: '/api/auth'
   },
-  onError: (err, req, res) => {
-    console.error('Proxy error:', err);
-    res.status(500).json({ error: 'Gateway proxy error' });
+  PRODUCT: {
+    url: process.env.PRODUCT_SERVICE_URL || 'http://product-service.memoire-ecommerce.svc.cluster.local:80',
+    path: '/api/products'
+  },
+  USER: {
+    url: process.env.USER_SERVICE_URL || 'http://user-service.memoire-ecommerce.svc.cluster.local:80',
+    path: '/api/user'
   }
 };
 
-// Proxy pour l'authentification
-app.use('/api/auth', createProxyMiddleware({
-  ...proxyOptions,
-  target: 'http://login-service:80',
-  pathRewrite: { '^/api/auth': '' }
-}));
-
-// Proxy pour les produits
-app.use('/api/products', createProxyMiddleware({
-  ...proxyOptions,
-  target: 'http://product-service:80',
-  pathRewrite: { '^/api/products': '' }
-}));
-
-// Proxy pour les utilisateurs
-app.use('/api/user', createProxyMiddleware({
-  ...proxyOptions,
-  target: 'http://user-service:80',
-  pathRewrite: { '^/api/user': '' }
-}));
-
-// Gestion des erreurs
-app.use((err, req, res, next) => {
-  console.error('Gateway error:', err.stack);
-  res.status(500).json({ error: 'Internal Gateway Error' });
+// Health Check Endpoint
+app.get('/healthz', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    services: Object.keys(SERVICES).reduce((acc, key) => {
+      acc[key.toLowerCase()] = SERVICES[key].url;
+      return acc;
+    }, {})
+  });
 });
 
-app.listen(7000, '0.0.0.0', () => {
-  console.log('🚀 Gateway démarré sur port 7000');
-  console.log('Routes configurées:');
-  console.log('- /api/auth -> login-service');
-  console.log('- /api/products -> product-service');
-  console.log('- /api/user -> user-service');
+// Proxy Middleware Configuration
+const createServiceProxy = (service) => {
+  return createProxyMiddleware({
+    target: service.url,
+    pathRewrite: { [`^${service.path}`]: '' },
+    logLevel: 'info',
+    changeOrigin: true,
+    secure: false,
+    timeout: 10000,
+    onProxyReq: (proxyReq) => {
+      console.log(`[Gateway] Routing to ${service.url}: ${proxyReq.method} ${proxyReq.path}`);
+    },
+    onError: (err, req, res) => {
+      console.error(`[Gateway Error] ${service.url}:`, err);
+      res.status(502).json({ 
+        error: 'Service Unavailable',
+        service: service.url.replace('.svc.cluster.local', ''),
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+};
+
+// Setup Proxies
+Object.values(SERVICES).forEach(service => {
+  app.use(service.path, createServiceProxy(service));
+});
+
+// Error Handling
+app.use((err, req, res, next) => {
+  console.error('[Gateway Error]', err.stack);
+  res.status(500).json({ 
+    error: 'Internal Server Error',
+    requestId: req.id,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Server Startup
+const PORT = process.env.PORT || 7000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Gateway running on port ${PORT}`);
+  console.log('Configured routes:');
+  Object.entries(SERVICES).forEach(([name, config]) => {
+    console.log(`- ${config.path} -> ${config.url}`);
+  });
 });

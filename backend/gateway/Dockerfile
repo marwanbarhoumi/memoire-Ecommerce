@@ -1,18 +1,26 @@
-# Utilise une image Node officielle
+# Utilise une image Node Alpine officielle
 FROM node:20-alpine
 
-# Crée un dossier de travail dans le conteneur
-WORKDIR /app
+# Configuration de l'environnement
+ENV NODE_ENV=production
+ENV PORT=7000
 
-# Copie les fichiers nécessaires
-COPY package*.json ./
-RUN npm install
+# Crée un dossier de travail sécurisé
+RUN mkdir -p /usr/src/app && chown node:node /usr/src/app
+WORKDIR /usr/src/app
 
-# Copie le reste des fichiers de l'application
-COPY . .
+# Installation des dépendances
+COPY --chown=node:node package*.json ./
+RUN npm ci --only=production
 
-# Expose le port utilisé par le Gateway
+# Copie de l'application
+COPY --chown=node:node . .
+
+# Utilisateur non-root pour la sécurité
+USER node
+
+# Exposition du port
 EXPOSE 7000
 
-# Commande de lancement
+# Commande de démarrage
 CMD ["node", "gateway.js"]

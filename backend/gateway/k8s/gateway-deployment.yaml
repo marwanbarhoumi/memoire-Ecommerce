@@ -3,8 +3,11 @@ kind: Deployment
 metadata:
   name: gateway-deployment
   namespace: memoire-ecommerce
+  labels:
+    app: gateway
+    tier: backend
 spec:
-  replicas: 1
+  replicas: 2
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -16,47 +19,62 @@ spec:
     metadata:
       labels:
         app: gateway
+        tier: backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "7000"
     spec:
       containers:
       - name: gateway
         image: marwen77/gateway-service:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 7000
+          name: http
         env:
         - name: PORT
           value: "7000"
         - name: NODE_ENV
           value: "production"
-        # Configuration des URLs des services internes
         - name: LOGIN_SERVICE_URL
-          value: "http://login-service.memoire-ecommerce.svc.cluster.local:80"
+          value: "http://login-service.memoire-ecommerce.svc.cluster.local"
         - name: PRODUCT_SERVICE_URL
-          value: "http://product-service.memoire-ecommerce.svc.cluster.local:80"
+          value: "http://product-service.memoire-ecommerce.svc.cluster.local"
         - name: USER_SERVICE_URL
-          value: "http://user-service.memoire-ecommerce.svc.cluster.local:80"
+          value: "http://user-service.memoire-ecommerce.svc.cluster.local"
+        - name: FRONTEND_URL
+          value: "http://frontend-service.memoire-ecommerce.svc.cluster.local"
         resources:
           limits:
-            cpu: "500m"
-            memory: "512Mi"
+            cpu: "1"
+            memory: "1Gi"
           requests:
             cpu: "100m"
-            memory: "128Mi"
-        # Probes adaptées à votre code existant
+            memory: "256Mi"
         livenessProbe:
           httpGet:
-            path: /gateway-status  # Utilise votre endpoint existant
-            port: 7000
+            path: /healthz
+            port: http
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            path: /gateway-status  # Utilise le même endpoint
-            port: 7000
+            path: /healthz
+            port: http
           initialDelaySeconds: 5
           periodSeconds: 5
+          timeoutSeconds: 3
         startupProbe:
           httpGet:
-            path: /gateway-status
-            port: 7000
-          failureThreshold: 30  # 30 x 10s = 5 minutes max
+            path: /healthz
+            port: http
+          failureThreshold: 30
           periodSeconds: 10
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
