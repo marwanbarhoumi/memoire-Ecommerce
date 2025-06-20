@@ -7,10 +7,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', 
+  origin: 'http://localhost:3000', // ton frontend React
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true 
+  credentials: true // si tu utilises des cookies ou headers d'auth
 }));
 
 app.use(express.json());

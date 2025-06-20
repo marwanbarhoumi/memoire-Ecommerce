@@ -3,6 +3,6 @@ services:
   login-service:
     image: marwen77/login-service:latest
     ports:
-      - "7002:7002"
+      - "7003:7002"
     environment:
       - NODE_ENV=production

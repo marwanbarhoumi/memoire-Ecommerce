@@ -54,17 +54,7 @@ pipeline {
       }
     }
 
-    stage('Deploy with Docker Compose') {
-      steps {
-        dir('backend/login') {
-          sh '''
-            docker-compose down || true
-            docker-compose up -d
-          '''
-        }
-      }
-    }
-
+    
     stage('Deploy to Kubernetes') {
       steps {
         dir('backend/login/k8s') {
