@@ -2,10 +2,10 @@ pipeline {
   agent any
 
   environment {
-    DOCKER_IMAGE = 'marwen77/login-service:latest'
-    DOCKER_CREDENTIALS_ID = 'docker-hub-credentials-id'
+    DOCKER_IMAGE             = 'marwen77/login-service:latest'
+    DOCKER_CREDENTIALS_ID    = 'docker-hub-credentials-id'
     KUBE_CONFIG_CREDENTIALS_ID = 'kubeconfig-credentials-id'
-    KUBE_NAMESPACE = 'memoire-ecommerce'
+    KUBE_NAMESPACE           = 'memoire-ecommerce'
   }
 
   stages {
@@ -54,6 +54,17 @@ pipeline {
       }
     }
 
+    stage('Deploy with Docker Compose') {
+      steps {
+        dir('backend/login') {
+          sh '''
+            docker-compose down || true
+            docker-compose up -d
+          '''
+        }
+      }
+    }
+
     stage('Deploy to Kubernetes') {
       steps {
         dir('backend/login/k8s') {
@@ -62,11 +73,11 @@ pipeline {
               mkdir -p ~/.kube
               cp "${KUBECONFIG_FILE}" ~/.kube/config
               chmod 600 ~/.kube/config
-              
+
               # Vérification du fichier
               head -n 5 ~/.kube/config
               kubectl config view --raw
-              
+
               kubectl config use-context minikube
               kubectl cluster-info
               kubectl apply -f login-deployment.yaml -n ${KUBE_NAMESPACE}
@@ -79,7 +90,7 @@ pipeline {
 
   post {
     always {
-      deleteDir() // Nettoyage du workspace sans besoin de plugin
+      deleteDir() // Nettoie le workspace sans plugin externe
     }
     success {
       echo '✅ Pipeline completed successfully 🚀'
