@@ -53,9 +53,7 @@ pipeline {
         }
       }
     }
-
-    
-    stage('Deploy to Kubernetes') {
+stage('Deploy to Kubernetes') {
       steps {
         dir('backend/login/k8s') {
           withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG_FILE')]) {
