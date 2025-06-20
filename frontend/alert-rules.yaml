@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: custom-alerts
+  namespace: monitoring
+  labels:
+    app: kube-prometheus-stack  # Should match your Prometheus Operator's selector
+spec:
+  groups:
+  - name: kubernetes-alerts
+    rules:
+    - alert: PodCrashLooping
+      expr: kube_pod_container_status_restarts_total > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Pod {{ $labels.pod }} en CrashLoop ({{ $value }} restarts)"
+        description: "Le pod {{ $labels.pod }} redémarre continuellement dans le namespace {{ $labels.namespace }}."

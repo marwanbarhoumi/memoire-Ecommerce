@@ -13,11 +13,12 @@ const AddProductForm = () => {
     price: "",
     qtes: "",
     description: "",
-    category: "", // Single string as per backend
-    size: "", // Will be converted to array in backend
-    color: "", // Will be converted to array in backend
+    category: "",
+    size: "",
+    color: "",
     disponible: true,
-    image: null
+    image: null,
+    imgUrl: ""
   });
 
   const handleChange = (e) => {
@@ -26,13 +27,47 @@ const AddProductForm = () => {
   };
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, image: e.target.files[0] });
+    setFormData({ 
+      ...formData, 
+      image: e.target.files[0],
+      imgUrl: "" // Reset URL si un fichier est sélectionné
+    });
   };
+
+ const validateImageUrl = (url) => {
+  if (!url) return false;
+  
+  try {
+    new URL(url); // Valide que c'est une URL bien formée
+    
+    // Vérifie soit l'extension dans le chemin, soit des motifs connus (comme Google Images)
+    return (
+      /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(url) || // Extensions classiques
+      /(encrypted-tbn0\.gstatic\.com|googleusercontent\.com)/i.test(url) || // Google Images
+      /(\.(jpg|jpeg|png|gif|webp)\?|&(format|type)=(jpe?g|png|gif|webp))/i.test(url) // URLs avec paramètres
+    );
+  } catch {
+    return false;
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    // Validation
+    if (!formData.name || !formData.price || !formData.qtes || !formData.category) {
+      setError("Les champs marqués d'un * sont obligatoires");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.imgUrl && !validateImageUrl(formData.imgUrl)) {
+      setError("Veuillez entrer une URL d'image valide (jpg, png, gif, webp)");
+      setLoading(false);
+      return;
+    }
 
     try {
       const data = new FormData();
@@ -44,17 +79,18 @@ const AddProductForm = () => {
       data.append("category", formData.category);
 
       // Optional fields
-      if (formData.description)
-        data.append("description", formData.description);
+      if (formData.description) data.append("description", formData.description);
       data.append("disponible", formData.disponible);
 
-      // Array fields (sent as comma-separated strings)
+      // Array fields
       if (formData.size) data.append("size", formData.size);
       if (formData.color) data.append("color", formData.color);
 
-      // Image handling
+      // Image handling (file OR URL)
       if (formData.image) {
         data.append("image", formData.image);
+      } else if (formData.imgUrl) {
+        data.append("imgUrl", formData.imgUrl);
       }
 
       await dispatch(addProduct(data));
@@ -69,8 +105,10 @@ const AddProductForm = () => {
         size: "",
         color: "",
         disponible: true,
-        image: null
+        image: null,
+        imgUrl: ""
       });
+      
     } catch (err) {
       setError(err.message || "Erreur lors de l'ajout du produit");
     } finally {
@@ -81,11 +119,11 @@ const AddProductForm = () => {
   return (
     <div className="add-product-container">
       <h1 className="add-product-title">Ajouter un nouveau produit</h1>
-      <form
-        className="add-product-form"
-        onSubmit={handleSubmit}
-        encType="multipart/form-data"
-      >
+      
+      {error && <div className="error-message">{error}</div>}
+
+      <form className="add-product-form" onSubmit={handleSubmit} encType="multipart/form-data">
+        
         {/* Name Field */}
         <div className="form-group">
           <label>Nom du Produit*</label>
@@ -149,6 +187,7 @@ const AddProductForm = () => {
             value={formData.description}
             onChange={handleChange}
             className="form-control"
+            rows="3"
           />
         </div>
 
@@ -192,22 +231,38 @@ const AddProductForm = () => {
           </select>
         </div>
 
-        {/* Image Field */}
-        <div className="form-group">
-          <label>Image du produit</label>
-          <input
-            type="file"
-            name="image"
-            onChange={handleFileChange}
-            className="form-control"
-          />
+        {/* Image Fields */}
+        <div className="form-group image-options">
+          <div>
+            <label>Uploader une image</label>
+            <input
+              type="file"
+              name="image"
+              onChange={handleFileChange}
+              className="form-control"
+              accept="image/*"
+            />
+          </div>
+          
+          <div className="divider">OU</div>
+          
+          <div>
+            <label>Utiliser une URL d'image</label>
+            <input
+              type="text"
+              name="imgUrl"
+              value={formData.imgUrl}
+              onChange={handleChange}
+              className="form-control"
+              placeholder="https://example.com/image.jpg"
+              disabled={!!formData.image}
+            />
+          </div>
         </div>
 
         <button type="submit" className="submit-btn" disabled={loading}>
           {loading ? "En cours..." : "Ajouter le Produit"}
         </button>
-
-        {error && <div className="error-message">{error}</div>}
       </form>
     </div>
   );

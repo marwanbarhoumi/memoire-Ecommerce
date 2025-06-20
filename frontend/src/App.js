@@ -20,6 +20,7 @@ function App() {
   useEffect(() => {
     dispatch(getUser());
   }, [dispatch]);
+  
   const currentUser = useSelector((state) => state.auth.currentUser);
 
   return (
@@ -35,11 +36,10 @@ function App() {
         <Route path="/products/:idprod" element={<ProductDetails />} />
         <Route path="/cart" element={<CartPage />} />
         <Route 
-            path="/edit/:id"  
-            element={currentUser?.role === "admin" ? <EditProduct /> : <Navigate to="/" />} 
-          />
+          path="/edit/:id"  
+          element={currentUser?.role === "admin" ? <EditProduct /> : <Navigate to="/" />} 
+        />
         
-        {/* Route pour les admins */}
         <Route
           path="/admin_dashbord"
           element={
@@ -53,7 +53,6 @@ function App() {
           }
         />
         
-        {/* Route pour les clients */}
         <Route
           path="/client_home"
           element={
@@ -66,9 +65,7 @@ function App() {
             </PrivateRoute>
           }
         />
-        
       </Routes>
-
     </div>
   );
 }
