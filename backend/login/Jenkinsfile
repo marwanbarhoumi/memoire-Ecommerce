@@ -54,43 +54,32 @@ pipeline {
       }
     }
 
-    stage('Deploy with Docker Compose') {
+    stage('Deploy to Kubernetes') {
       steps {
-        dir('backend/login') {
-          sh '''
-            docker-compose down || true
-            docker-compose up -d
-          '''
+        dir('backend/login/k8s') {
+          withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG_FILE')]) {
+            sh '''
+              mkdir -p ~/.kube
+              cp "${KUBECONFIG_FILE}" ~/.kube/config
+              chmod 600 ~/.kube/config
+              
+              # Vérification du fichier
+              head -n 5 ~/.kube/config
+              kubectl config view --raw
+              
+              kubectl config use-context minikube
+              kubectl cluster-info
+              kubectl apply -f login-deployment.yaml -n ${KUBE_NAMESPACE}
+            '''
+          }
         }
       }
     }
-
-    stage('Deploy to Kubernetes') {
-  steps {
-    dir('backend/login/k8s') {
-      withCredentials([file(credentialsId: env.KUBE_CONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG_FILE')]) {
-        sh '''
-          mkdir -p ~/.kube
-          cp "${KUBECONFIG_FILE}" ~/.kube/config
-          chmod 600 ~/.kube/config
-          
-          # Vérification du fichier
-          head -n 5 ~/.kube/config
-          kubectl config view --raw
-          
-          kubectl config use-context minikube
-          kubectl cluster-info
-          kubectl apply -f login-deployment.yaml -n ${KUBE_NAMESPACE}
-        '''
-      }
-    }
-  }
-}
   }
 
   post {
     always {
-      cleanWs()
+      deleteDir() // Nettoyage du workspace sans besoin de plugin
     }
     success {
       echo '✅ Pipeline completed successfully 🚀'
