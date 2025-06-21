@@ -13,14 +13,15 @@ import AddProduct from "./Components/Products/AddProduct";
 import EditProduct from "./Components/Products/EditProduct";
 import ProductDetails from "./Components/Products/ProductDetails";
 import PrivateRoute from "./Components/Private_Routes";
-import CartPage from './Components/Products/CartPage';
+import CartPage from "./Components/Products/CartPage";
+import GestionCommandes from "./Components/Private_Routes/Admin/GestionCommandes";
+import CommandeClient from "./Components/Private_Routes/Client/CommandeClient";
 
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getUser());
   }, [dispatch]);
-  
   const currentUser = useSelector((state) => state.auth.currentUser);
 
   return (
@@ -35,11 +36,46 @@ function App() {
         <Route path="/edit" element={<EditProduct />} />
         <Route path="/products/:idprod" element={<ProductDetails />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route 
-          path="/edit/:id"  
-          element={currentUser?.role === "admin" ? <EditProduct /> : <Navigate to="/" />} 
+        <Route
+          path="/edit/:id"
+          element={
+            currentUser?.role === "admin" ? (
+              <EditProduct />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
-        
+
+        {/* Route Admin - Gestion des commandes */}
+        <Route
+          path="/admin_commandes"
+          element={
+            <PrivateRoute>
+              {currentUser?.role === "admin" ? (
+                <GestionCommandes />
+              ) : (
+                <Navigate to="/" />
+              )}
+            </PrivateRoute>
+          }
+        />
+
+        {/* Route Client - Mes commandes */}
+        <Route
+          path="/commande-client"
+          element={
+            <PrivateRoute>
+              {currentUser?.role === "client" ? (
+                <CommandeClient />
+              ) : (
+                <Navigate to="/" />
+              )}
+            </PrivateRoute>
+          }
+        />
+
+        {/* Route pour les admins */}
         <Route
           path="/admin_dashbord"
           element={
@@ -52,16 +88,13 @@ function App() {
             </PrivateRoute>
           }
         />
-        
+
+        {/* Route pour les clients */}
         <Route
           path="/client_home"
           element={
             <PrivateRoute>
-              {currentUser?.role === "client" ? (
-                <Home />
-              ) : (
-                <Navigate to="/" />
-              )}
+              {currentUser?.role === "client" ? <Home /> : <Navigate to="/" />}
             </PrivateRoute>
           }
         />

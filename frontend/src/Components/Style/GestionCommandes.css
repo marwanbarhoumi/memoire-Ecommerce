@@ -1,0 +1,49 @@
+.container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .table th, .table td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+    text-align: left;
+  }
+  
+  .table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+  }
+  
+  .badge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+  
+  .bg-warning {
+    background-color: #ffc107;
+    color: #000;
+  }
+  
+  .bg-success {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .alert {
+    padding: 15px;
+    border-radius: 4px;
+    margin-top: 20px;
+  }
+  
+  .alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
