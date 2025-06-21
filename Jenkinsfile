@@ -46,6 +46,15 @@ pipeline {
         }
       }
     }
+
+     stage('commande Service Pipeline') {
+      steps {
+        dir('backend/commende') {
+          echo '▶️ Démarrage du pipeline commande'
+          build job: 'commande-service-pipeline'
+        }
+      }
+    }
   } // <-- Correction : Cette accolade fermante manquait
 
   post {
