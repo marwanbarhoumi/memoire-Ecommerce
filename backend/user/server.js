@@ -9,6 +9,7 @@ const app = express();
 // Enhanced CORS Configuration
 const corsOptions = {
   origin: [
+    'http://localhost:3002',
     'http://localhost:3000', // Frontend dev
     'http://127.0.0.1:3000', // Alternative localhost
     process.env.FRONTEND_URL // From env if available

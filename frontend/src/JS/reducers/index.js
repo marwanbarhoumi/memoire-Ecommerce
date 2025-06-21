@@ -4,6 +4,7 @@ import { productreducers } from "./productreducer";
 import { reviewreducers } from "./reviewreducer";
 import {clientReducer} from "./clientReducer";
 import { cartReducer } from "./cartreducer";
+import {commandeReducer} from "./commandeReducer";
 
 export const rootReducer = combineReducers({
   auth: authReducer,
@@ -11,5 +12,6 @@ export const rootReducer = combineReducers({
   client: clientReducer,
   rev: reviewreducers,
   cart: cartReducer,
+  commande: commandeReducer,
   
 });

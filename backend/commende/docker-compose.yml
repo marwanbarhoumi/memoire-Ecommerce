@@ -1,8 +1,8 @@
 version: '3'
 services:
   login-service:
-    image: marwen77/login-service:latest
+    image: marwen77/commande-service:latest
     ports:
-      - "7002:7002"
+      - "7005:7005"
     environment:
       - NODE_ENV=production
