@@ -44,7 +44,7 @@ describe("ProductCard Component", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("img")).toHaveAttribute(
       "src",
-      "http://localhost:7003/images/test.jpg"
+      "http://localhost:7100/images/test.jpg"
     );
     expect(screen.getByText("Voir détails")).toBeInTheDocument();
   });

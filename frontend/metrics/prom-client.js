@@ -15,7 +15,7 @@ const register = client.register;
 
 // Example middleware for Express.js
 function metricsMiddleware(req, res, next) {
-  const startTime = Date.now();
+  const startTime = Date.now(); 
   
   res.on('finish', () => {
     httpRequestCounter.inc({

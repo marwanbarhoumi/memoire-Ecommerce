@@ -18,6 +18,7 @@ const isAdmin = require("../middlewares/authorization/isAdmin");
 
 const router = express.Router();
 
+
 /**
  * @route GET /product/health
  * @description Vérifier l'état du service produit

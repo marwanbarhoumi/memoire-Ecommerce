@@ -23,7 +23,7 @@ const ProductCard = ({ prd }) => {
       <div className="card-image-container">
         <Card.Img
           variant="top"
-          src={prd.img.replace("http://localhost:4000", "http://localhost:7003")}
+          src={prd.img.replace("http://localhost:4000", "http://localhost:7100")}
           className="card-image"
           alt={prd.name}
         />

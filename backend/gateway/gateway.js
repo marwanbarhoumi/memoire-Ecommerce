@@ -16,7 +16,7 @@ app.use('/api/auth/', createProxyMiddleware({
 
 // Proxy pour le microservice des produits
 app.use('/api/products', createProxyMiddleware({
-  target: 'http://localhost:7003',  // Microservice des produits sur le port 7003
+  target: 'http://localhost:7100',  // Microservice des produits sur le port 7100
   changeOrigin: true
  
 }));
@@ -26,8 +26,8 @@ app.use('/api/auth', createProxyMiddleware({
   changeOrigin: true
 }));
 
-app.use('/api/commande', createProxyMiddleware({
-  target: 'http://localhost:7005',  // Microservice des commande sur le port 7004
+app.use('/api/commende', createProxyMiddleware({
+  target: 'http://localhost:7005',  // Microservice des commande sur le port 7005
   changeOrigin: true
 }));
 

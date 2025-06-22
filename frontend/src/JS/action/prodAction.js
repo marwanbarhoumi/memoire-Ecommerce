@@ -89,7 +89,7 @@ export const addProduct = (formData) => async (dispatch, getState) => {
     };
 
     const { data } = await axios.post(
-      'http://localhost:7003/api/products/add',
+      'http://localhost:7100/api/products/add',
       formData,
       config
     );

@@ -1,0 +1,24 @@
+global:
+  resolve_timeout: 1m
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1m
+  receiver: 'lab-alert-manager'
+
+receivers:
+  - name: 'lab-alert-manager'
+    slack_configs:
+      - send_resolved: true
+        channel: '#tous-monitoring'
+        api_url: 'https://hooks.slack.com/services/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'
+    email_configs:
+      - to: 'marwanbarhou77@gmail.com'
+        from: 'marwanbarhou77@gmail.com'
+        smarthost: 'smtp.gmail.com:587'
+        auth_username: 'marwanbarhou77@gmail.com'
+        auth_identity: 'grafana'
+        auth_password: 'hmzg czzc diiy nssj'
+        send_resolved: true

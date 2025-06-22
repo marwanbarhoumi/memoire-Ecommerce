@@ -6,95 +6,62 @@ const userRouter = require("./routes/userRoute");
 
 const app = express();
 
-// Enhanced CORS Configuration
-const corsOptions = {
-  origin: [
-    'http://localhost:3002',
-    'http://localhost:3000', // Frontend dev
-    'http://127.0.0.1:3000', // Alternative localhost
-    process.env.FRONTEND_URL // From env if available
-  ].filter(Boolean),
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-};
-
-// Apply CORS middleware
-app.use(cors(corsOptions));
-
-// Handle preflight requests
-app.options('*', cors(corsOptions));
-
 // Middleware
+app.use(cors({
+  origin: 'http://localhost:3000', // Frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // Allow credentials like cookies or headers
+}));
+ 
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Database Connection
 connectDB();
 
 // Routes
-app.use("/api", userRouter);
+app.use("/api/auth", userRouter);
 
-// Enhanced Health Check
+// Health Check Endpoint
 app.get("/api/users/health", (req, res) => {
   res.status(200).json({
     status: "OK",
     service: "user-service",
     db: "connected",
-    cors: "enabled",
-    allowedOrigins: corsOptions.origin,
+    fileStorage: "enabled",
+    auth: "active",
     timestamp: new Date().toISOString()
   });
 });
 
-// Enhanced Error Handling
+// Error Handling Middleware
 app.use((err, req, res, next) => {
-  console.error(`[${new Date().toISOString()}] User Service Error:`, err);
+  console.error("User Service Error:", err);
 
-  const response = {
+  res.status(err.status || 500).json({
     success: false,
-    error: err.message || "Internal Server Error"
-  };
-
-  if (process.env.NODE_ENV === "development") {
-    response.stack = err.stack;
-    response.details = {
-      method: req.method,
-      path: req.path,
-      headers: req.headers
-    };
-  }
-
-  res.status(err.status || 500).json(response);
+    error: err.message || "Internal Server Error",
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined
+  });
 });
 
 // Server Configuration
 const PORT = process.env.USER_PORT || 7004;
 const HOST = process.env.HOST || "0.0.0.0";
 
-const server = app.listen(PORT, HOST, () => {
+app.listen(PORT, HOST, () => {
   console.log(`
   🚀 User Service successfully started
   📌 Port: ${PORT}
   🌐 Base URL: http://${HOST}:${PORT}/api/users
   🔒 Auth URL: http://${HOST}:${PORT}/api/auth
   📁 Avatars: http://${HOST}:${PORT}/avatars/
-  🔐 CORS Enabled for: ${corsOptions.origin.join(', ')}
   ⏰ Started: ${new Date().toLocaleString()}
   `);
 });
 
-// Enhanced process handlers
 process.on("unhandledRejection", (err) => {
-  console.error(`[${new Date().toISOString()}] Unhandled Rejection:`, err);
-  server.close(() => process.exit(1));
-});
-
-process.on("SIGTERM", () => {
-  console.log(`[${new Date().toISOString()}] SIGTERM received`);
-  server.close(() => {
-    console.log("Process terminated");
-  });
+  console.error("Unhandled Rejection:", err);
+  process.exit(1);
 });

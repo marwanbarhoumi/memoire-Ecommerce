@@ -13,7 +13,7 @@ module.exports = function (app) {
   app.use(
     '/api/products',
     createProxyMiddleware({
-      target: 'http://localhost:7003',
+      target: 'http://localhost:7100',
       changeOrigin: true,
       pathRewrite: { '^/api/products': '' },
     })
