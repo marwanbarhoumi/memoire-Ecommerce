@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    DOCKER_IMAGE = 'marwen77/frontend:latest'
+    DOCKER_IMAGE = 'marwen77/frontend1:latest'
     DOCKER_CREDENTIALS_ID = 'docker-hub-credentials-id'
     KUBE_CONFIG_CREDENTIALS_ID = 'kubeconfig-credentials-id'
   }
